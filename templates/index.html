@@ -260,13 +260,21 @@
     {% endif %}
 
     <script>
-        // Inicializa os ícones do Lucide
+        const dateInput = document.getElementById('data');
+        const today = new Date().toISOString().split('T')[0];
+        dateInput.setAttribute('max', today);
+
+        window.onload = () => {
+            if (document.querySelector('.dashboard-section')) {
+                setTimeout(() => {
+                    document.querySelector('.dashboard-section').scrollIntoView({ behavior: 'smooth' });
+            }, 500);
+        }
+    }
         lucide.createIcons();
 
-        // Registra Plugins do GSAP (Tiramos o TextPlugin pra não quebrar as cores)
         gsap.registerPlugin(ScrollTrigger);
 
-        // Animação de entrada do Hero
         const tl = gsap.timeline();
         tl.from(".hero-content > *", {
             y: 30,
@@ -276,7 +284,6 @@
             ease: "power3.out"
         });
 
-        // Animação dos cards do Bento Grid ao rolar a página
         gsap.utils.toArray('.gs-reveal').forEach(function(elem) {
             ScrollTrigger.create({
                 trigger: elem,
@@ -290,7 +297,6 @@
             });
         });
 
-        // Efeito Spotlight nos cards (o brilho segue o mouse)
         document.querySelectorAll('.glass-panel').forEach(card => {
             card.addEventListener('mousemove', e => {
                 const rect = card.getBoundingClientRect();
@@ -302,8 +308,7 @@
                 card.style.background = 'var(--tw-gradient-stops, rgba(15, 23, 42, 0.6))';
             });
         });
-        
-        // Rolar suavemente para o painel se houver dados (asteróides carregados)
+
         window.onload = () => {
             if (document.querySelector('.dashboard-section')) {
                 setTimeout(() => {
