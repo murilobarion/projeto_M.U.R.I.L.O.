@@ -24,7 +24,8 @@
                         mono: ['JetBrains Mono', 'monospace'],
                         display: ['Orbitron', 'sans-serif'],
                         terminal: ['VT323', 'monospace'],
-                        apple: ['-apple-system', 'BlinkMacSystemFont', '"SF Pro Text"', '"Segoe UI"', 'Roboto', 'Inter', 'sans-serif'],
+                        // FONTE SF PRO TEXT PRIORITÁRIA
+                        apple: ['"SF Pro Text"', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', 'sans-serif'],
                     },
                     colors: {
                         space: '#000000',
@@ -81,6 +82,12 @@
         }
         @keyframes scanline { 0% { top: -100px; } 100% { top: 100vh; } }
 
+        /* CLASSE DE DESTAQUE AZUL */
+        .destaque-azul {
+            color: #38bdf8;
+            font-weight: bold;
+        }
+
         .ticker-wrap { width: 100%; overflow: hidden; background-color: rgba(2, 6, 23, 0.9); border-bottom: 1px solid rgba(56,189,248,0.2); }
         .ticker { display: inline-block; white-space: nowrap; padding-right: 100%; }
 
@@ -110,7 +117,7 @@
         .hidden-row { display: none !important; }
     </style>
 </head>
-<body class="bg-space text-slate-400 font-sans overflow-x-hidden antialiased selection:bg-electric selection:text-black crt">
+<body class="bg-space text-slate-400 font-apple overflow-x-hidden antialiased selection:bg-electric selection:text-black crt">
 
     <div class="stars"></div>
     <div class="twinkling"></div>
@@ -139,12 +146,12 @@
             <i data-lucide="satellite" class="w-4 h-4"></i> Rede de Telemetria
         </h2>
         
-        <h1 class="font-display text-5xl md:text-7xl font-extrabold text-white mb-6 tracking-tight drop-shadow-2xl italic">
-            Projeto <span class="text-electric">M.U.R.I.L.O.</span><span class="cursor"></span>
+        <h1 class="font-apple text-5xl md:text-7xl font-extrabold text-white mb-6 tracking-tight drop-shadow-2xl italic">
+            Projeto M<span class="destaque-azul">.</span>U<span class="destaque-azul">.</span>R<span class="destaque-azul">.</span>I<span class="destaque-azul">.</span>L<span class="destaque-azul">.</span>O<span class="destaque-azul">.</span><span class="cursor"></span>
         </h1>
         
-        <p class="text-lg md:text-xl text-slate-300 font-terminal mb-10 max-w-3xl mx-auto uppercase tracking-widest">
-            Monitoramento Universal de Rochas Interplanetárias e Lixo Orbital
+        <p class="text-lg md:text-xl text-slate-300 font-apple mb-10 max-w-3xl mx-auto uppercase tracking-widest">
+            <span class="destaque-azul">M</span>onitoramento <span class="destaque-azul">U</span>niversal de <span class="destaque-azul">R</span>ochas <span class="destaque-azul">I</span>nterplanetárias e <span class="destaque-azul">L</span>ixo <span class="destaque-azul">O</span>rbital
         </p>
         
         <div class="w-full flex flex-col items-center gap-6">
@@ -189,7 +196,7 @@
     <main class="w-full max-w-7xl mx-auto px-6 pb-24 z-10 relative dashboard-section">
         <div class="mb-12 border-b border-white/10 pb-6 flex justify-between items-end">
             <div>
-                <h3 class="font-display text-3xl text-white uppercase italic">Relatório Tático</h3>
+                <h3 class="font-apple text-3xl text-white uppercase italic">Relatório Tático</h3>
                 <p class="font-mono text-sm text-electric mt-2">Data da Varredura: {{ data }}</p>
             </div>
             <div class="text-right hidden md:block">
@@ -208,7 +215,7 @@
                     <h4 class="font-mono text-xs uppercase tracking-widest">Ameaças Detectadas</h4>
                 </div>
                 <div class="mt-auto">
-                    <span class="text-6xl font-display font-bold text-white group-hover:text-nebula transition-colors counter">{{ asteroides|length }}</span>
+                    <span class="text-6xl font-apple font-bold text-white group-hover:text-nebula transition-colors counter">{{ asteroides|length }}</span>
                     <p class="text-sm mt-2 text-slate-500">Objetos rastreados</p>
                 </div>
             </div>
@@ -225,10 +232,10 @@
                     </div>
                     <div>
                         {% if hazardous.found %}
-                            <h5 class="text-3xl font-display font-bold text-alert mb-2 uppercase flex items-center gap-3">Alerta Crítico <span class="relative flex h-3 w-3"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-alert opacity-75"></span><span class="relative inline-flex rounded-full h-3 w-3 bg-alert"></span></span></h5>
+                            <h5 class="text-3xl font-apple font-bold text-alert mb-2 uppercase flex items-center gap-3">Alerta Crítico <span class="relative flex h-3 w-3"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-alert opacity-75"></span><span class="relative inline-flex rounded-full h-3 w-3 bg-alert"></span></span></h5>
                             <p class="text-slate-400 font-light italic">Detectamos anomalias classificadas como <strong class="text-white">Potencialmente Perigosas</strong>.</p>
                         {% else %}
-                            <h5 class="text-3xl font-display font-bold text-terminal_green mb-2 uppercase">Vetor Limpo</h5>
+                            <h5 class="text-3xl font-apple font-bold text-terminal_green mb-2 uppercase">Vetor Limpo</h5>
                             <p class="text-slate-400 font-light italic">Nenhum objeto com classificação de risco detectado.</p>
                         {% endif %}
                     </div>
@@ -257,7 +264,7 @@
                             {% set f_idx = (asteroide.id | int) % 10 %}
                             <tr class="hover:bg-white/[0.02] transition-colors group asteroid-row" data-hazardous="{{ 'true' if asteroide.is_potentially_hazardous_asteroid else 'false' }}">
                                 <td class="p-4 pl-6"><div class="w-10 h-10 rounded-full overflow-hidden border border-white/10 bg-slate-900"><img src="{{ fotos_procedurais[f_idx] }}" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1614728894747-a83421e2b9c9?w=100&h=100&fit=crop';" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all"></div></td>
-                                <td class="p-4"><span class="font-display font-bold text-white group-hover:text-electric transition-colors uppercase">{{ asteroide.name.replace('(', '').replace(')', '') }}</span><div class="text-[0.6rem] text-slate-500 font-mono">#{{ asteroide.id }}</div></td>
+                                <td class="p-4"><span class="font-apple font-bold text-white group-hover:text-electric transition-colors uppercase">{{ asteroide.name.replace('(', '').replace(')', '') }}</span><div class="text-[0.6rem] text-slate-500 font-mono">#{{ asteroide.id }}</div></td>
                                 <td class="p-4 font-mono text-slate-300">{{ asteroide.estimated_diameter.meters.estimated_diameter_max | round(1) }}m</td>
                                 <td class="p-4 font-mono text-slate-300">{{ (asteroide.close_approach_data[0].relative_velocity.kilometers_per_hour | float / 1000) | round(1) }}k km/h</td>
                                 <td class="p-4 font-mono"><div class="text-slate-300">{{ (asteroide.close_approach_data[0].miss_distance.kilometers | float / 1000000) | round(2) }}M km</div><div class="text-[0.6rem] text-slate-500">{{ asteroide.close_approach_data[0].miss_distance.lunar | float | round(1) }} LD</div></td>
@@ -324,14 +331,14 @@
             setTimeout(() => { document.querySelector('.dashboard-section').scrollIntoView({ behavior: 'smooth' }); }, 500);
         }
 
-        // ANIMAÇÕES GSAP CORRIGIDAS (ONCE: TRUE)
+        // ANIMAÇÕES GSAP
         gsap.from(".hero-content > *", { y: 30, opacity: 0, duration: 1, stagger: 0.2, ease: "power3.out" });
 
         gsap.utils.toArray('.gs-reveal').forEach(function(elem) {
             ScrollTrigger.create({
                 trigger: elem,
                 start: "top 85%",
-                once: true, // ANIMA APENAS UMA VEZ PARA EVITAR O BUG DE PULAR
+                once: true,
                 onEnter: function() {
                     gsap.fromTo(elem, { y: 50, opacity: 0 }, { duration: 0.8, y: 0, opacity: 1, ease: "power3.out", overwrite: "auto" });
                 }
