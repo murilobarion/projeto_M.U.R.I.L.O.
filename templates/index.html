@@ -48,14 +48,6 @@
     <script src="https://unpkg.com/lucide@latest"></script>
 
     <style>
-        @font-face {
-            font-family: "SF Pro Text";
-            src: url("https://db.onlinewebfonts.com/t/00d5a73e46e30065355694770243425c.woff2") format("woff2");
-        }
-
-        .font-apple {
-            font-family: "SF Pro Text", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
-        }
         .stars, .twinkling {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
             width: 100%; height: 100%; display: block;
@@ -125,7 +117,7 @@
         .hidden-row { display: none !important; }
     </style>
 </head>
-<body class="bg-space text-slate-400 font-apple overflow-x-hidden antialiased selection:bg-electric selection:text-black">
+<body class="bg-space text-slate-400 font-apple overflow-x-hidden antialiased selection:bg-electric selection:text-black crt">
 
     <div class="stars"></div>
     <div class="twinkling"></div>
@@ -142,44 +134,60 @@
     </div>
 
     <header class="min-h-screen flex flex-col justify-center items-center relative px-4 pt-20 pb-32">
-        <div class="text-center z-10 w-full max-w-5xl mx-auto hero-content">
-            
-            <div class="flex justify-center mb-8">
-                <div class="p-1 bg-electric/10 rounded-full border border-electric/30 shadow-[0_0_40px_rgba(56,189,248,0.1)]">
-                    <img src="{{ url_for('static', filename='img/logo-murilo.png') }}" class="w-24 h-24 md:w-32 md:h-32 rounded-full">
-                </div>
-            </div>
-
-            <h1 class="font-apple text-5xl md:text-8xl font-bold text-white mb-6 tracking-tight">
-                Projeto <span class="text-electric">M.U.R.I.L.O.</span><span class="cursor"></span>
-            </h1>
-            
-            <p class="text-xl md:text-2xl text-slate-300 font-apple max-w-3xl mx-auto leading-relaxed">
-                <span class="text-electric font-bold">M</span>onitoramento 
-                <span class="text-electric font-bold">U</span>niversal de 
-                <span class="text-electric font-bold">R</span>ochas 
-                <span class="text-electric font-bold">I</span>nterplanetárias e 
-                <span class="text-electric font-bold">L</span>ixo 
-                <span class="text-electric font-bold">O</span>rbital
-            </p>
-            
-            <div class="w-full flex flex-col items-center gap-6 mt-12">
-                <form method="POST" class="glass-panel p-2 rounded-2xl md:rounded-full flex flex-col md:flex-row items-center gap-2 border-electric/20 w-full md:w-auto">
-                    <div class="flex items-center px-6 py-4 md:py-3 border-b md:border-b-0 md:border-r border-white/10 w-full md:w-auto">
-                        <i data-lucide="calendar" class="w-5 h-5 text-electric mr-4"></i>
-                        <div class="flex flex-col text-left">
-                            <span class="text-[10px] font-mono text-slate-500 uppercase tracking-tighter">Data Alvo</span>
-                            <input type="date" id="data" name="data" required 
-                                   class="bg-transparent border-none text-white font-mono outline-none focus:ring-0 [&::-webkit-calendar-picker-indicator]:invert">
-                        </div>
-                    </div>
-                    <button type="submit" class="w-full md:w-auto bg-electric hover:bg-white text-black font-bold py-4 px-10 rounded-xl md:rounded-full transition-all duration-300 flex items-center justify-center gap-3 uppercase text-xs tracking-widest">
-                        <i data-lucide="crosshair" class="w-4 h-4"></i> Iniciar Varredura
-                    </button>
-                </form>
+    <div class="text-center z-10 w-full max-w-5xl mx-auto hero-content">
+        
+        <div class="flex justify-center mb-6">
+            <div class="p-1 bg-electric/10 rounded-full border border-electric/30 shadow-[0_0_40px_rgba(56,189,248,0.2)]">
+                <img src="{{ url_for('static', filename='img/logo-murilo.png') }}" class="w-24 h-24 md:w-32 md:h-32 rounded-full">
             </div>
         </div>
-    </header>
+
+        <h2 class="text-electric font-mono text-sm tracking-[0.3em] mb-4 uppercase flex items-center justify-center gap-2">
+            <i data-lucide="satellite" class="w-4 h-4"></i> Rede de Telemetria
+        </h2>
+        
+        <h1 class="font-apple text-5xl md:text-7xl font-extrabold text-white mb-6 tracking-tight drop-shadow-2xl italic">
+            Projeto M<span class="destaque-azul">.</span>U<span class="destaque-azul">.</span>R<span class="destaque-azul">.</span>I<span class="destaque-azul">.</span>L<span class="destaque-azul">.</span>O<span class="destaque-azul">.</span><span class="cursor"></span>
+        </h1>
+        
+        <p class="text-lg md:text-xl text-slate-300 font-apple mb-10 max-w-3xl mx-auto uppercase tracking-widest">
+            <span class="destaque-azul">M</span>onitoramento <span class="destaque-azul">U</span>niversal de <span class="destaque-azul">R</span>ochas <span class="destaque-azul">I</span>nterplanetárias e <span class="destaque-azul">L</span>ixo <span class="destaque-azul">O</span>rbital
+        </p>
+        
+        <div class="w-full flex flex-col items-center gap-6">
+            <form method="POST" class="glass-panel p-2 rounded-2xl md:rounded-full flex flex-col md:flex-row items-center gap-2 border-electric/20 w-full md:w-auto">
+                
+                <div class="flex items-center px-6 py-4 md:py-3 border-b md:border-b-0 md:border-r border-white/10 w-full md:w-auto">
+                    <i data-lucide="calendar" class="w-5 h-5 text-electric mr-4"></i>
+                    <div class="flex flex-col text-left">
+                        <span class="text-[10px] font-mono text-slate-500 uppercase tracking-tighter">Data Alvo</span>
+                        <input type="date" id="data" name="data" required 
+                               class="bg-transparent border-none text-white font-mono outline-none focus:ring-0 [&::-webkit-calendar-picker-indicator]:invert">
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full md:w-auto bg-electric hover:bg-white text-black font-bold py-4 px-10 rounded-xl md:rounded-full transition-all duration-300 flex items-center justify-center gap-3 uppercase text-xs tracking-widest shadow-[0_0_20px_rgba(56,189,248,0.3)]">
+                    <i data-lucide="crosshair" class="w-4 h-4"></i> Iniciar Varredura
+                </button>
+            </form>
+
+            {% if asteroides %}
+            <form action="/exportar" method="POST" class="gs-reveal">
+                <input type="hidden" name="data_export" value="{{ data }}">
+                <button type="submit" class="group flex items-center gap-3 px-6 py-3 bg-black/40 border border-electric/30 rounded-full hover:bg-electric/10 transition-all duration-300">
+                    <i data-lucide="download" class="w-4 h-4 text-electric group-hover:animate-bounce"></i>
+                    <span class="font-mono text-[10px] uppercase tracking-widest text-electric">Download Log de Telemetria (.CSV)</span>
+                </button>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+    
+    <div class="absolute bottom-10 animate-bounce text-slate-500 flex flex-col items-center gap-2 opacity-50">
+        <span class="text-[0.6rem] font-mono uppercase tracking-widest">Status Data</span>
+        <i data-lucide="chevron-down" class="w-5 h-5"></i>
+    </div>
+</header>
 
     {% if asteroides %}
     <script id="data-labels" type="application/json">{{ chart_labels | safe }}</script>
