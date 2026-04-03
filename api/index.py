@@ -89,11 +89,8 @@ def exportar():
                 })
             
             df = pd.DataFrame(lista_relatorio)
-            
-            # --- AJUSTES DE FORMATAÇÃO PARA EXCEL BRASILEIRO ---
+ 
             buffer = io.BytesIO()
-            # sep=';' separa as colunas no Excel BR
-            # encoding='utf-8-sig' resolve o problema de acentos e caracteres especiais
             df.to_csv(buffer, index=False, sep=';', encoding='utf-8-sig') 
             buffer.seek(0)
             
