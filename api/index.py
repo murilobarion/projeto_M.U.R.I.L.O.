@@ -6,7 +6,9 @@ import pandas as pd
 import io
 from datetime import datetime
 
-app = Flask(__name__)
+app = Flask(__name__, 
+            template_folder='../templates', 
+            static_folder='../static')
 
 def get_nasa_apod():
     api_key = os.environ.get('NASA_API_KEY', "faZ5X3HvBrJ32ynZMH7lp08wBESv3ZOdKmXuf6f3")
