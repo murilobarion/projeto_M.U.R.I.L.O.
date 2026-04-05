@@ -69,9 +69,9 @@
 
     <header class="min-h-screen flex flex-col justify-center items-center relative px-4 pt-20 pb-32">
         <div class="text-center z-10 w-full max-w-5xl mx-auto hero-content">
-            <div class="flex justify-center mb-6">
-                <div class="p-1 bg-electric/10 rounded-full border border-electric/30 shadow-[0_0_40px_rgba(56,189,248,0.2)]">
-                    <img src="{{ url_for('static', filename='img/logo-murilo.png') }}" class="w-24 h-24 md:w-32 md:h-32 rounded-full">
+            <div class="flex justify-center mb-6 hero-logo-container">
+                <div class="p-2 bg-electric/10 rounded-xl border border-electric/30 shadow-[0_0_40px_rgba(56,189,248,0.2)]">
+                    <img src="{{ url_for('static', filename='img/logo.png') }}" class="max-h-24 md:max-h-32 w-auto object-contain block">
                 </div>
             </div>
             <h2 class="text-electric font-mono text-sm tracking-[0.3em] mb-4 uppercase flex items-center justify-center gap-2">
@@ -204,7 +204,34 @@
                 <span class="text-xl font-apple text-white uppercase italic">{{ space_weather | default('Scanning...') }}</span>
             </div>
 
+            <div class="glass-panel p-6 rounded-3xl md:col-span-2 flex flex-col justify-between gs-reveal border-terminal_green/30 shadow-[0_0_20px_rgba(0,255,65,0.05)]">
+                <div class="flex items-center gap-3 text-slate-400 mb-2">
+                    <i data-lucide="gem" class="w-5 h-5 text-terminal_green"></i>
+                    <h4 class="font-mono text-[10px] uppercase tracking-widest">Mineração Espacial Estimada</h4>
+                </div>
+                <div class="mt-2">
+                    <p class="text-[10px] text-slate-500 font-mono mb-2">Oportunidade Capitalista Interplanetária</p>
+                    <button onclick="gerarContratoMineracao()" class="w-full bg-terminal_green/10 hover:bg-terminal_green border border-terminal_green/50 text-terminal_green hover:text-black transition-all px-4 py-2 rounded-lg font-mono text-[10px] uppercase tracking-widest flex items-center justify-center gap-2">
+                        <i data-lucide="file-text" class="w-4 h-4"></i> Reivindicar Direitos (PDF)
+                    </button>
+                </div>
+            </div>
+
+            <div class="glass-panel p-6 rounded-3xl md:col-span-2 flex flex-col justify-between gs-reveal border-alert/20">
+                <div class="flex items-center gap-3 text-slate-400 mb-2">
+                    <i data-lucide="bomb" class="w-5 h-5 text-alert"></i>
+                    <h4 class="font-mono text-[10px] uppercase tracking-widest">Simulador de Cratera Local</h4>
+                </div>
+                <div class="mt-2">
+                    <p class="text-[10px] text-slate-500 font-mono mb-2">Se a maior anomalia de hoje cair na sua cabeça:</p>
+                    <button id="btn-cratera" onclick="simularImpacto()" class="w-full bg-alert/10 hover:bg-alert border border-alert/50 text-alert hover:text-white transition-all px-4 py-2 rounded-lg font-mono text-[10px] uppercase tracking-widest flex items-center justify-center gap-2">
+                        <i data-lucide="map-pin" class="w-4 h-4"></i> Calcular Estrago Local
+                    </button>
+                </div>
+            </div>
+
             {% if terremotos %}
+
             <div class="glass-panel p-6 rounded-3xl md:col-span-4 flex flex-col md:flex-row justify-between items-center group gs-reveal border-orange-500/20 shadow-[0_0_20px_rgba(249,115,22,0.05)]">
                 <div class="flex items-center gap-4 mb-4 md:mb-0">
                     <div class="p-3 bg-orange-500/10 rounded-full border border-orange-500/30">
@@ -384,7 +411,73 @@
             </button>
         </div>
     </div>
+
+    <div id="custom-mining-modal" class="hidden fixed inset-0 flex items-center justify-center p-6 z-[200] bg-black/80 backdrop-blur-sm transition-opacity">
+        <div class="glass-panel p-8 max-w-md w-full relative border-t-4 border-terminal_green rounded-2xl shadow-[0_0_40px_rgba(0,255,65,0.2)] text-center">
+            <div class="mx-auto w-12 h-12 mb-4 bg-terminal_green/20 rounded-full flex items-center justify-center border border-terminal_green/50">
+                <i data-lucide="gem" class="w-6 h-6 text-terminal_green"></i>
+            </div>
+            <h2 class="text-xl font-display text-white mb-2 tracking-widest uppercase">Contrato de Mineração</h2>
+            <div class="font-mono text-xs text-slate-400 mb-6 leading-relaxed space-y-2 text-left bg-black/50 p-4 rounded-lg border border-terminal_green/20">
+                <p><span class="text-terminal_green">>> ALVO:</span> <span id="mine-target" class="text-white"></span></p>
+                <p><span class="text-terminal_green">>> VALOR ESTIMADO:</span> <span id="mine-value" class="text-white font-bold"></span></p>
+                <p class="mt-4 text-[10px] italic text-slate-500">O contrato foi gerado no terminal. Aguarde o contato dos nossos advogados intergalácticos para o pagamento da taxa de registro (apenas em Bitcoins).</p>
+            </div>
+            <button onclick="document.getElementById('custom-mining-modal').classList.add('hidden')" class="bg-terminal_green/10 hover:bg-terminal_green text-terminal_green hover:text-black border border-terminal_green/30 transition-all duration-300 px-8 py-3 rounded-full font-mono text-xs uppercase tracking-widest w-full">
+                Aceitar Termos Milionários
+            </button>
+        </div>
+    </div>
+
+    <div id="custom-crater-modal" class="hidden fixed inset-0 flex items-center justify-center p-6 z-[200] bg-black/80 backdrop-blur-sm transition-opacity">
+        <div class="glass-panel p-8 max-w-md w-full relative border-t-4 border-alert rounded-2xl shadow-[0_0_40px_rgba(255,0,60,0.2)] text-center">
+            <div class="mx-auto w-12 h-12 mb-4 bg-alert/20 rounded-full flex items-center justify-center border border-alert/50">
+                <i data-lucide="bomb" class="w-6 h-6 text-alert"></i>
+            </div>
+            <h2 class="text-xl font-display text-white mb-2 tracking-widest uppercase">Simulação de Impacto</h2>
+            <div class="font-mono text-xs text-slate-400 mb-6 leading-relaxed space-y-2 text-left bg-black/50 p-4 rounded-lg border border-alert/20">
+                <p><span class="text-alert">>> ALVO CALCULADO:</span> <span id="crater-location" class="text-white"></span></p>
+                <p><span class="text-alert">>> DIÂMETRO DO OBJETO:</span> <span id="crater-obj-size" class="text-white font-bold"></span></p>
+                <p><span class="text-alert">>> DIÂMETRO DA CRATERA:</span> <span id="crater-size" class="text-white font-bold"></span></p>
+                <p><span class="text-alert">>> RAIO DE ONDA DE CHOQUE:</span> <span id="crater-blast" class="text-white font-bold"></span></p>
+                <p><span class="text-alert">>> ABALO SÍSMICO:</span> <span id="crater-quake" class="text-white font-bold"></span></p>
+                <p><span class="text-alert">>> VÍTIMAS ESTIMADAS 💀:</span> <span id="crater-casualties" class="text-white font-bold"></span></p>
+                <p class="mt-4 text-[10px] italic text-slate-500">Como em todo filme de Hollywood, a anomalia ignorou o resto do planeta e mirou no centro dos EUA. Tenha um bom dia.</p>
+            </div>
+            <button onclick="document.getElementById('custom-crater-modal').classList.add('hidden')" class="bg-alert/10 hover:bg-alert text-alert hover:text-white border border-alert/30 transition-all duration-300 px-8 py-3 rounded-full font-mono text-xs uppercase tracking-widest w-full">
+                Fechar Simulação
+            </button>
+        </div>
+    </div>
+
     {% endif %}
+    
+    <footer class="w-full max-w-7xl mx-auto px-6 pb-24 pt-16 border-t border-white/5 text-center relative z-10 gs-reveal">
+        <div class="flex flex-col items-center justify-center gap-4">
+            <div class="w-12 h-12 border border-electric/30 rounded-full flex items-center justify-center bg-electric/5 text-electric shadow-[0_0_15px_rgba(56,189,248,0.2)]">
+                <i data-lucide="code-2" class="w-6 h-6"></i>
+            </div>
+            <p class="font-mono text-[10px] text-slate-500 uppercase tracking-[0.2em] leading-relaxed">
+                Sistema M.U.R.I.L.O. © 2026<br>
+                Codificado por <span class="text-electric font-bold drop-shadow-[0_0_5px_rgba(56,189,248,0.8)]">Murilo Barion</span>
+            </p>
+        </div>
+    </footer>
+
+    <div class="fixed bottom-0 w-full z-[60] bg-black/95 border-t-2 border-electric/40 p-2 overflow-hidden pointer-events-none shadow-[0_-5px_20px_rgba(0,0,0,0.8)]">
+        <div class="whitespace-nowrap flex" style="animation: scrollGossip 70s linear infinite;">
+            <span class="font-terminal text-electric text-sm px-12">>> URGENTE: Sindicato dos Marcianos declara greve após aproximação do último meteoro.</span>
+            <span class="font-terminal text-alert text-sm px-12">>> ECONOMIA: Elon Musk registra domínio 'X-Asteroid-Mining.mars'. Ações da SpaceX sobem 200%.</span>
+            <span class="font-terminal text-terminal_green text-sm px-12">>> ALERTA: Detritos da missão Apollo 11 quase atingem satélite pirata de TV a cabo.</span>
+            <span class="font-terminal text-orange-400 text-sm px-12">>> POLÍTICA: Prefeito de Osasco aprova lei cobrando IPTU de crateras alienígenas.</span>
+        </div>
+    </div>
+    <style>
+        @keyframes scrollGossip {
+            0% { transform: translateX(100vw); }
+            100% { transform: translateX(-150%); }
+        }
+    </style>
 
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </body>

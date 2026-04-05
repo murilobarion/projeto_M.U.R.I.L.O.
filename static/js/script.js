@@ -142,6 +142,22 @@ function initOrbitalViewer() {
     const earthMaterial = new THREE.MeshBasicMaterial({ color: 0x38bdf8, wireframe: true, transparent: true, opacity: 0.4 });
     const earth = new THREE.Mesh(earthGeometry, earthMaterial);
     scene.add(earth);
+    const debrisCount = 2500;
+    const debrisGeom = new THREE.BufferGeometry();
+    const debrisPoss = new Float32Array(debrisCount * 3);
+    for(let i=0; i<debrisCount*3; i+=3) {
+        const r = 30.5 + Math.random() * 2.5; 
+        const theta = Math.random() * 2 * Math.PI;
+        const phi = Math.acos(Math.random() * 2 - 1);
+        debrisPoss[i] = r * Math.sin(phi) * Math.cos(theta);
+        debrisPoss[i+1] = r * Math.sin(phi) * Math.sin(theta);
+        debrisPoss[i+2] = r * Math.cos(phi);
+    }
+
+    debrisGeom.setAttribute('position', new THREE.BufferAttribute(debrisPoss, 3));
+    const debrisMat = new THREE.PointsMaterial({ color: 0xff003c, size: 0.15, transparent: true, opacity: 0.8 });
+    const debrisSystem = new THREE.Points(debrisGeom, debrisMat);
+    scene.add(debrisSystem);
 
     const orbitalGroup = new THREE.Group();
     scene.add(orbitalGroup);
@@ -216,6 +232,11 @@ function initOrbitalViewer() {
     function animate() {
         requestAnimationFrame(animate);
         earth.rotation.y += 0.003;
+
+        if(typeof debrisSystem !== 'undefined') {
+            debrisSystem.rotation.y += 0.002;
+            debrisSystem.rotation.x += 0.0005;
+        }
         
         pivots.forEach(pivot => {
             pivot.rotation.y += pivot.userData.speed; 
@@ -224,6 +245,7 @@ function initOrbitalViewer() {
         controls.update();
         renderer.render(scene, camera);
     }
+
     animate();
 }
 
@@ -261,6 +283,77 @@ function generateDossier() {
     content.innerHTML = html;
 }
 
+function simularImpacto() {
+    const btn = document.getElementById('btn-cratera');
+    btn.innerHTML = `<i data-lucide="loader" class="w-4 h-4 animate-spin"></i> Hackeando Satélites...`;
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+    
+    setTimeout(() => {
+        const asteroidsDataEl = document.getElementById('data-3d-asteroids');
+        let maiorDiametro = 100; // Padrão caso dê erro
+        if (asteroidsDataEl) {
+            const asteroids = JSON.parse(asteroidsDataEl.textContent);
+            if (asteroids.length > 0) {
+                maiorDiametro = Math.max(...asteroids.map(a => a.diameter));
+            }
+        }
+        
+        // 1. Lista de 12 clássicos de filmes de alien/meteoro nos EUA
+        const locations = [
+            "KANSAS CITY, KANSAS",
+            "OMAHA, NEBRASKA",
+            "OKLAHOMA CITY, OKLAHOMA",
+            "ROSWELL, NEW MEXICO",
+            "DALLAS, TEXAS",
+            "DENVER, COLORADO",
+            "CHEYENNE, WYOMING",
+            "SALT LAKE CITY, UTAH",
+            "WICHITA, KANSAS",
+            "SIOUX FALLS, SOUTH DAKOTA",
+            "ÁREA 51, NEVADA",
+            "DES MOINES, IOWA"
+        ];
+
+        const randomLocation = locations[Math.floor(Math.random() * locations.length)];
+
+        const crateraKm = (maiorDiametro * 0.05).toFixed(1); 
+        const blastRadius = (crateraKm * 3.5).toFixed(1); 
+        const quakeMag = (Math.log10(maiorDiametro) * 3.2).toFixed(1); 
+
+        const casualties = Math.floor(maiorDiametro * 1850).toLocaleString('pt-BR');
+
+        document.getElementById('crater-location').innerText = randomLocation;
+        document.getElementById('crater-obj-size').innerText = maiorDiametro.toFixed(1) + " metros";
+        document.getElementById('crater-size').innerText = crateraKm + " km";
+        document.getElementById('crater-blast').innerText = blastRadius + " km de cinzas";
+        document.getElementById('crater-quake').innerText = quakeMag + " Richter";
+        document.getElementById('crater-casualties').innerText = casualties + " almas";
+
+        document.getElementById('custom-crater-modal').classList.remove('hidden');
+        btn.innerHTML = `<i data-lucide="map-pin" class="w-4 h-4"></i> Calcular Estrago Local`;
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+    }, 1500);
+}
+
+function gerarContratoMineracao() {
+    const asteroidesData = document.getElementById('data-3d-asteroids');
+    let valorTrilhoes = (Math.random() * 90 + 10).toFixed(2); 
+    let nomeMina = "Asteroid-X";
+    
+    if (asteroidesData) {
+        const asteroids = JSON.parse(asteroidesData.textContent);
+        if (asteroids.length > 0) {
+            nomeMina = asteroids[0].name;
+            valorTrilhoes = ((asteroids[0].diameter * 100) / 1000).toFixed(2);
+        }
+    }
+
+    document.getElementById('mine-target').innerText = nomeMina;
+    document.getElementById('mine-value').innerText = "$" + valorTrilhoes + " Trilhões de Dólares";
+
+    document.getElementById('custom-mining-modal').classList.remove('hidden');
+}
+
 function closeDossierAndShowAlert() {
     document.getElementById('dossier-template').classList.add('hidden');
     document.getElementById('custom-alert-modal').classList.remove('hidden');
@@ -270,8 +363,8 @@ function closeDossierAndShowAlert() {
         }
     }
 
-    function closeCustomAlert() {
-        document.getElementById('custom-alert-modal').classList.add('hidden');
+function closeCustomAlert() {
+    document.getElementById('custom-alert-modal').classList.add('hidden');
     }
 
 document.addEventListener('DOMContentLoaded', () => {
