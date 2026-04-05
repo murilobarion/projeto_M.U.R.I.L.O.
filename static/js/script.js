@@ -142,22 +142,6 @@ function initOrbitalViewer() {
     const earthMaterial = new THREE.MeshBasicMaterial({ color: 0x38bdf8, wireframe: true, transparent: true, opacity: 0.4 });
     const earth = new THREE.Mesh(earthGeometry, earthMaterial);
     scene.add(earth);
-    const debrisCount = 2500;
-    const debrisGeom = new THREE.BufferGeometry();
-    const debrisPoss = new Float32Array(debrisCount * 3);
-    for(let i=0; i<debrisCount*3; i+=3) {
-        const r = 30.5 + Math.random() * 2.5; 
-        const theta = Math.random() * 2 * Math.PI;
-        const phi = Math.acos(Math.random() * 2 - 1);
-        debrisPoss[i] = r * Math.sin(phi) * Math.cos(theta);
-        debrisPoss[i+1] = r * Math.sin(phi) * Math.sin(theta);
-        debrisPoss[i+2] = r * Math.cos(phi);
-    }
-
-    debrisGeom.setAttribute('position', new THREE.BufferAttribute(debrisPoss, 3));
-    const debrisMat = new THREE.PointsMaterial({ color: 0xff003c, size: 0.15, transparent: true, opacity: 0.8 });
-    const debrisSystem = new THREE.Points(debrisGeom, debrisMat);
-    scene.add(debrisSystem);
 
     const orbitalGroup = new THREE.Group();
     scene.add(orbitalGroup);
@@ -175,12 +159,13 @@ function initOrbitalViewer() {
         astSystem.rotation.x = Math.random() * Math.PI;
         astSystem.rotation.y = Math.random() * Math.PI;
 
-        const orbitGeom = new THREE.RingGeometry(radius, radius + 0.04, 128);
+        const orbitGeom = new THREE.RingGeometry(radius, radius + 0.5, 128);
         const orbitMat = new THREE.MeshBasicMaterial({ 
-            color: 0xa8b1ff,
+            color: 0x818cf8, 
             side: THREE.DoubleSide, 
             transparent: true, 
-            opacity: 0.65
+            opacity: 0.9, 
+            blending: THREE.AdditiveBlending 
         });
 
         const orbitMesh = new THREE.Mesh(orbitGeom, orbitMat);
@@ -193,15 +178,16 @@ function initOrbitalViewer() {
         pivot.userData.speed = 0.001 + (Math.random() * 0.002);
         astSystem.add(pivot);
 
-        let rawScale = (astData.diameter / 1000.0) * 1.5; 
-        let minChecked = Math.max(rawScale, 0.4);
-        const scaledRadius = Math.min(minChecked, 3.0);
+        let rawScale = (astData.diameter / 1000.0) * 4; 
+        let minChecked = Math.max(rawScale, 1.5);
+        const scaledRadius = Math.min(minChecked, 6.0);
         const astGeometry = new THREE.SphereGeometry(scaledRadius, 16, 16);
         const astMaterial = new THREE.MeshLambertMaterial({ 
             color: asteroideColor,
             emissive: asteroideColor,
             emissiveIntensity: 0.2
         });
+        
         const astPoint = new THREE.Mesh(astGeometry, astMaterial);
         const label = createAsteroidLabel(astData.name);
         label.position.set(0, scaledRadius + 1.5, 0); 
