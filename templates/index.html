@@ -5,34 +5,33 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Projeto M.U.R.I.L.O.</title>
 
-    <link rel="icon" type="image/png" href="/static/img/logo-murilo.png">
-    
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/logo-murilo.png') }}">
     <meta name="description" content="Projeto M.U.R.I.L.O. - Monitoramento Universal de Rochas Interplanetárias">
-    
+
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=JetBrains+Mono:wght@400;700&family=Orbitron:wght@500;800&family=VT323&display=swap" rel="stylesheet">
-    
+
+    <!-- Tailwind CSS (CDN) -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                        mono: ['JetBrains Mono', 'monospace'],
-                        display: ['Orbitron', 'sans-serif'],
+                        sans:     ['Inter', 'sans-serif'],
+                        mono:     ['JetBrains Mono', 'monospace'],
+                        display:  ['Orbitron', 'sans-serif'],
                         terminal: ['VT323', 'monospace'],
-                        // FONTE SF PRO TEXT PRIORITÁRIA
-                        apple: ['"SF Pro Text"', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', 'sans-serif'],
+                        apple:    ['"SF Pro Text"', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', 'sans-serif'],
                     },
                     colors: {
-                        space: '#000000',
-                        slate950: '#020617',
-                        electric: '#38bdf8',
-                        nebula: '#818cf8',
-                        alert: '#ff003c',
+                        space:          '#000000',
+                        slate950:       '#020617',
+                        electric:       '#38bdf8',
+                        nebula:         '#818cf8',
+                        alert:          '#ff003c',
                         terminal_green: '#00ff41'
                     },
                     backgroundImage: {
@@ -43,157 +42,103 @@
         }
     </script>
 
+    <!-- Bibliotecas de terceiros (CDN) — devem vir ANTES do script.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <style>
-        .stars, .twinkling {
-            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            width: 100%; height: 100%; display: block;
-        }
-        .stars { background: #000 url('https://raw.githubusercontent.com/danielstuart14/CSS_Fills/master/star-bg.png') repeat top center; z-index: -2; }
-        .twinkling { background: transparent url('https://raw.githubusercontent.com/danielstuart14/CSS_Fills/master/twinkling.png') repeat top center; z-index: -1; animation: move-twink-back 200s linear infinite; }
-        @keyframes move-twink-back { from {background-position: 0 0;} to {background-position: -10000px 5000px;} }
-
-        .dynamic-nasa-bg { 
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; 
-            background-size: cover; background-position: center; opacity: 0.3; filter: brightness(0.4);
-            background-image: url('{{ bg_nasa }}'); 
-        }
-
-        .crt::before {
-            content: " "; display: block; position: fixed; top: 0; left: 0; bottom: 0; right: 0;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.15) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
-            z-index: 100; background-size: 100% 4px, 3px 100%; pointer-events: none;
-        }
-
-        .glass-panel {
-            background: rgba(15, 23, 42, 0.7);
-            backdrop-filter: blur(24px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
-        }
-        
-        .scanline {
-            width: 100%; height: 100px; z-index: 50; position: fixed; pointer-events: none;
-            background: linear-gradient(0deg, rgba(0,0,0,0) 0%, rgba(56,189,248,0.05) 50%, rgba(0,0,0,0) 100%);
-            opacity: 0.1; animation: scanline 8s linear infinite;
-        }
-        @keyframes scanline { 0% { top: -100px; } 100% { top: 100vh; } }
-
-        /* CLASSE DE DESTAQUE AZUL */
-        .destaque-azul {
-            color: #38bdf8;
-            font-weight: bold;
-        }
-
-        .ticker-wrap { width: 100%; overflow: hidden; background-color: rgba(2, 6, 23, 0.9); border-bottom: 1px solid rgba(56,189,248,0.2); }
-        .ticker { display: inline-block; white-space: nowrap; padding-right: 100%; }
-
-        .radar { 
-            position: relative; width: 120px; height: 120px; border-radius: 50%; 
-            border: 2px solid rgba(56,189,248,0.5); overflow: hidden; background: black;
-            box-shadow: inset 0 0 20px #001a2c;
-        }
-
-        .radar::after {
-            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: conic-gradient(from 0deg, rgba(56,189,248,0.5) 0%, transparent 40%);
-            animation: spin 2s linear infinite;
-        }
-
-        .radar::before {
-            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle, transparent 30%, rgba(56,189,248,0.1) 31%, transparent 32%, transparent 60%, rgba(56,189,248,0.1) 61%, transparent 62%), linear-gradient(to right, rgba(56,189,248,0.1) 1px, transparent 1px), linear-gradient(to bottom, rgba(56,189,248,0.1) 1px, transparent 1px);
-            background-size: 100% 100%, 50% 100%, 100% 50%; z-index: 1;
-        }
-
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-
-        .cursor { display: inline-block; width: 10px; height: 1em; background: #38bdf8; margin-left: 4px; animation: blink 1s infinite; vertical-align: middle; }
-        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
-
-        .hidden-row { display: none !important; }
-    </style>
+    <!-- CSS do projeto -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body class="bg-space text-slate-400 font-apple overflow-x-hidden antialiased selection:bg-electric selection:text-black crt">
 
+    <!-- Camadas de fundo -->
     <div class="stars"></div>
     <div class="twinkling"></div>
-    <div class="dynamic-nasa-bg"></div>
+    <!-- background-image definido inline para que o Jinja2 resolva bg_nasa corretamente -->
+    <div class="dynamic-nasa-bg" style="background-image: url('{{ bg_nasa }}');"></div>
     <div class="scanline"></div>
 
+    <!-- Cantos decorativos -->
     <div class="fixed top-4 left-4 w-8 h-8 border-t-2 border-l-2 border-electric opacity-50 z-50 pointer-events-none"></div>
     <div class="fixed top-4 right-4 w-8 h-8 border-t-2 border-r-2 border-electric opacity-50 z-50 pointer-events-none"></div>
     <div class="fixed bottom-4 left-4 w-8 h-8 border-b-2 border-l-2 border-electric opacity-50 z-50 pointer-events-none"></div>
     <div class="fixed bottom-4 right-4 w-8 h-8 border-b-2 border-r-2 border-electric opacity-50 z-50 pointer-events-none"></div>
 
+    <!-- Ticker superior -->
     <div class="fixed top-0 z-40 ticker-wrap py-1 font-mono text-[10px] text-electric/80 uppercase tracking-widest">
         <div class="ticker" id="typewriter-ticker"></div>
     </div>
 
+    <!-- ═══════════════════ HERO ═══════════════════ -->
     <header class="min-h-screen flex flex-col justify-center items-center relative px-4 pt-20 pb-32">
-    <div class="text-center z-10 w-full max-w-5xl mx-auto hero-content">
-        
-        <div class="flex justify-center mb-6">
-            <div class="p-1 bg-electric/10 rounded-full border border-electric/30 shadow-[0_0_40px_rgba(56,189,248,0.2)]">
-                <img src="{{ url_for('static', filename='img/logo-murilo.png') }}" class="w-24 h-24 md:w-32 md:h-32 rounded-full">
+        <div class="text-center z-10 w-full max-w-5xl mx-auto hero-content">
+
+            <div class="flex justify-center mb-6">
+                <div class="p-1 bg-electric/10 rounded-full border border-electric/30 shadow-[0_0_40px_rgba(56,189,248,0.2)]">
+                    <img src="{{ url_for('static', filename='img/logo-murilo.png') }}" class="w-24 h-24 md:w-32 md:h-32 rounded-full">
+                </div>
+            </div>
+
+            <h2 class="text-electric font-mono text-sm tracking-[0.3em] mb-4 uppercase flex items-center justify-center gap-2">
+                <i data-lucide="satellite" class="w-4 h-4"></i> Rede de Telemetria
+            </h2>
+
+            <h1 class="font-apple text-5xl md:text-7xl font-extrabold text-white mb-6 tracking-tight drop-shadow-2xl italic">
+                Projeto M<span class="destaque-azul">.</span>U<span class="destaque-azul">.</span>R<span class="destaque-azul">.</span>I<span class="destaque-azul">.</span>L<span class="destaque-azul">.</span>O<span class="destaque-azul">.</span><span class="cursor"></span>
+            </h1>
+
+            <p class="text-lg md:text-xl text-slate-300 font-apple mb-10 max-w-3xl mx-auto uppercase tracking-widest">
+                <span class="destaque-azul">M</span>onitoramento
+                <span class="destaque-azul">U</span>niversal de
+                <span class="destaque-azul">R</span>ochas
+                <span class="destaque-azul">I</span>nterplanetárias e
+                <span class="destaque-azul">L</span>ixo
+                <span class="destaque-azul">O</span>rbital
+            </p>
+
+            <div class="w-full flex flex-col items-center gap-6">
+                <form method="POST" class="glass-panel p-2 rounded-2xl md:rounded-full flex flex-col md:flex-row items-center gap-2 border-electric/20 w-full md:w-auto">
+                    <div class="flex items-center px-6 py-4 md:py-3 border-b md:border-b-0 md:border-r border-white/10 w-full md:w-auto">
+                        <i data-lucide="calendar" class="w-5 h-5 text-electric mr-4"></i>
+                        <div class="flex flex-col text-left">
+                            <span class="text-[10px] font-mono text-slate-500 uppercase tracking-tighter">Data Alvo</span>
+                            <input type="date" id="data" name="data" required
+                                   class="bg-transparent border-none text-white font-mono outline-none focus:ring-0 [&::-webkit-calendar-picker-indicator]:invert">
+                        </div>
+                    </div>
+                    <button type="submit" class="w-full md:w-auto bg-electric hover:bg-white text-black font-bold py-4 px-10 rounded-xl md:rounded-full transition-all duration-300 flex items-center justify-center gap-3 uppercase text-xs tracking-widest shadow-[0_0_20px_rgba(56,189,248,0.3)]">
+                        <i data-lucide="crosshair" class="w-4 h-4"></i> Iniciar Varredura
+                    </button>
+                </form>
+
+                {% if asteroides %}
+                <form action="/exportar" method="POST" class="gs-reveal">
+                    <input type="hidden" name="data_export" value="{{ data }}">
+                    <button type="submit" class="group flex items-center gap-3 px-6 py-3 bg-black/40 border border-electric/30 rounded-full hover:bg-electric/10 transition-all duration-300">
+                        <i data-lucide="download" class="w-4 h-4 text-electric group-hover:animate-bounce"></i>
+                        <span class="font-mono text-[10px] uppercase tracking-widest text-electric">Download Log de Telemetria (.CSV)</span>
+                    </button>
+                </form>
+                {% endif %}
             </div>
         </div>
 
-        <h2 class="text-electric font-mono text-sm tracking-[0.3em] mb-4 uppercase flex items-center justify-center gap-2">
-            <i data-lucide="satellite" class="w-4 h-4"></i> Rede de Telemetria
-        </h2>
-        
-        <h1 class="font-apple text-5xl md:text-7xl font-extrabold text-white mb-6 tracking-tight drop-shadow-2xl italic">
-            Projeto M<span class="destaque-azul">.</span>U<span class="destaque-azul">.</span>R<span class="destaque-azul">.</span>I<span class="destaque-azul">.</span>L<span class="destaque-azul">.</span>O<span class="destaque-azul">.</span><span class="cursor"></span>
-        </h1>
-        
-        <p class="text-lg md:text-xl text-slate-300 font-apple mb-10 max-w-3xl mx-auto uppercase tracking-widest">
-            <span class="destaque-azul">M</span>onitoramento <span class="destaque-azul">U</span>niversal de <span class="destaque-azul">R</span>ochas <span class="destaque-azul">I</span>nterplanetárias e <span class="destaque-azul">L</span>ixo <span class="destaque-azul">O</span>rbital
-        </p>
-        
-        <div class="w-full flex flex-col items-center gap-6">
-            <form method="POST" class="glass-panel p-2 rounded-2xl md:rounded-full flex flex-col md:flex-row items-center gap-2 border-electric/20 w-full md:w-auto">
-                
-                <div class="flex items-center px-6 py-4 md:py-3 border-b md:border-b-0 md:border-r border-white/10 w-full md:w-auto">
-                    <i data-lucide="calendar" class="w-5 h-5 text-electric mr-4"></i>
-                    <div class="flex flex-col text-left">
-                        <span class="text-[10px] font-mono text-slate-500 uppercase tracking-tighter">Data Alvo</span>
-                        <input type="date" id="data" name="data" required 
-                               class="bg-transparent border-none text-white font-mono outline-none focus:ring-0 [&::-webkit-calendar-picker-indicator]:invert">
-                    </div>
-                </div>
-
-                <button type="submit" class="w-full md:w-auto bg-electric hover:bg-white text-black font-bold py-4 px-10 rounded-xl md:rounded-full transition-all duration-300 flex items-center justify-center gap-3 uppercase text-xs tracking-widest shadow-[0_0_20px_rgba(56,189,248,0.3)]">
-                    <i data-lucide="crosshair" class="w-4 h-4"></i> Iniciar Varredura
-                </button>
-            </form>
-
-            {% if asteroides %}
-            <form action="/exportar" method="POST" class="gs-reveal">
-                <input type="hidden" name="data_export" value="{{ data }}">
-                <button type="submit" class="group flex items-center gap-3 px-6 py-3 bg-black/40 border border-electric/30 rounded-full hover:bg-electric/10 transition-all duration-300">
-                    <i data-lucide="download" class="w-4 h-4 text-electric group-hover:animate-bounce"></i>
-                    <span class="font-mono text-[10px] uppercase tracking-widest text-electric">Download Log de Telemetria (.CSV)</span>
-                </button>
-            </form>
-            {% endif %}
+        <div class="absolute bottom-10 animate-bounce text-slate-500 flex flex-col items-center gap-2 opacity-50">
+            <span class="text-[0.6rem] font-mono uppercase tracking-widest">Status Data</span>
+            <i data-lucide="chevron-down" class="w-5 h-5"></i>
         </div>
-    </div>
-    
-    <div class="absolute bottom-10 animate-bounce text-slate-500 flex flex-col items-center gap-2 opacity-50">
-        <span class="text-[0.6rem] font-mono uppercase tracking-widest">Status Data</span>
-        <i data-lucide="chevron-down" class="w-5 h-5"></i>
-    </div>
-</header>
+    </header>
 
+    <!-- ═══════════════════ DASHBOARD ═══════════════════ -->
     {% if asteroides %}
+    {# Dados do gráfico passados via JSON inline para o script.js #}
     <script id="data-labels" type="application/json">{{ chart_labels | safe }}</script>
-    <script id="data-sizes" type="application/json">{{ chart_data | safe }}</script>
-    
+    <script id="data-sizes"  type="application/json">{{ chart_data  | safe }}</script>
+
     <main class="w-full max-w-7xl mx-auto px-6 pb-24 z-10 relative dashboard-section">
+
         <div class="mb-12 border-b border-white/10 pb-6 flex justify-between items-end">
             <div>
                 <h3 class="font-apple text-3xl text-white uppercase italic">Relatório Tático</h3>
@@ -209,6 +154,8 @@
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+
+            <!-- Card: total de objetos -->
             <div class="glass-panel p-6 rounded-3xl md:col-span-1 flex flex-col justify-between group gs-reveal">
                 <div class="flex items-center gap-3 text-slate-400 mb-4">
                     <i data-lucide="activity" class="w-5 h-5 text-nebula"></i>
@@ -223,8 +170,10 @@
             {% set hazardous = namespace(found=false) %}
             {% for asteroide in asteroides %}{% if asteroide.is_potentially_hazardous_asteroid %}{% set hazardous.found = true %}{% endif %}{% endfor %}
 
+            <!-- Card: análise de risco -->
             <div class="glass-panel p-6 rounded-3xl md:col-span-2 relative overflow-hidden group gs-reveal {% if hazardous.found %}border-alert/50 shadow-[0_0_30px_rgba(255,0,60,0.15)]{% endif %}">
-                <div class="absolute inset-0 bg-cover bg-center opacity-20 mix-blend-screen grayscale group-hover:scale-105 transition-transform duration-1000" style="background-image: url('https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?q=80&w=1000&auto=format&fit=crop');"></div>
+                <div class="absolute inset-0 bg-cover bg-center opacity-20 mix-blend-screen grayscale group-hover:scale-105 transition-transform duration-1000"
+                     style="background-image: url('https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?q=80&w=1000&auto=format&fit=crop');"></div>
                 <div class="relative z-10 h-full flex flex-col justify-between">
                     <div class="flex items-center gap-3 mb-4">
                         <i data-lucide="alert-triangle" class="w-5 h-5 {% if hazardous.found %}text-alert{% else %}text-terminal_green{% endif %}"></i>
@@ -232,7 +181,13 @@
                     </div>
                     <div>
                         {% if hazardous.found %}
-                            <h5 class="text-3xl font-apple font-bold text-alert mb-2 uppercase flex items-center gap-3">Alerta Crítico <span class="relative flex h-3 w-3"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-alert opacity-75"></span><span class="relative inline-flex rounded-full h-3 w-3 bg-alert"></span></span></h5>
+                            <h5 class="text-3xl font-apple font-bold text-alert mb-2 uppercase flex items-center gap-3">
+                                Alerta Crítico
+                                <span class="relative flex h-3 w-3">
+                                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-alert opacity-75"></span>
+                                    <span class="relative inline-flex rounded-full h-3 w-3 bg-alert"></span>
+                                </span>
+                            </h5>
                             <p class="text-slate-400 font-light italic">Detectamos anomalias classificadas como <strong class="text-white">Potencialmente Perigosas</strong>.</p>
                         {% else %}
                             <h5 class="text-3xl font-apple font-bold text-terminal_green mb-2 uppercase">Vetor Limpo</h5>
@@ -242,117 +197,85 @@
                 </div>
             </div>
 
+            <!-- Card: radar + filtro -->
             <div class="glass-panel p-6 rounded-3xl md:col-span-1 flex flex-col items-center justify-center gs-reveal text-center">
                 <div class="radar mb-4"></div>
-                <button onclick="toggleHazardous()" id="filterBtn" class="font-mono text-[0.6rem] border border-electric/30 px-3 py-1 rounded-full text-electric hover:bg-electric hover:text-black transition-all uppercase tracking-tighter">Filtro de Risco: OFF</button>
+                <button onclick="toggleHazardous()" id="filterBtn"
+                        class="font-mono text-[0.6rem] border border-electric/30 px-3 py-1 rounded-full text-electric hover:bg-electric hover:text-black transition-all uppercase tracking-tighter">
+                    Filtro de Risco: OFF
+                </button>
             </div>
-            
+
+            <!-- Card: gráfico de magnitude -->
             <div class="glass-panel p-6 rounded-3xl md:col-span-4 gs-reveal">
-                <h4 class="font-mono text-[0.7rem] uppercase tracking-widest mb-4 flex items-center gap-2 text-electric"><i data-lucide="bar-chart-3" class="w-4 h-4"></i> Escala de Magnitude (Diâmetro m)</h4>
+                <h4 class="font-mono text-[0.7rem] uppercase tracking-widest mb-4 flex items-center gap-2 text-electric">
+                    <i data-lucide="bar-chart-3" class="w-4 h-4"></i> Escala de Magnitude (Diâmetro m)
+                </h4>
                 <div style="height: 200px; width: 100%;"><canvas id="sizeChart"></canvas></div>
             </div>
 
+            <!-- Tabela de telemetria detalhada -->
             <div class="glass-panel rounded-3xl md:col-span-4 overflow-hidden gs-reveal border-white/5">
-                <div class="p-6 border-b border-white/5"><h4 class="font-mono text-sm uppercase text-slate-300 flex items-center gap-2"><i data-lucide="database" class="w-4 h-4 text-electric"></i> Telemetria Detalhada</h4></div>
+                <div class="p-6 border-b border-white/5">
+                    <h4 class="font-mono text-sm uppercase text-slate-300 flex items-center gap-2">
+                        <i data-lucide="database" class="w-4 h-4 text-electric"></i> Telemetria Detalhada
+                    </h4>
+                </div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left whitespace-nowrap">
                         <thead class="bg-white/5 font-mono text-[0.7rem] uppercase text-slate-400 tracking-wider">
-                            <tr><th class="p-4 pl-6">Visual</th><th class="p-4">Objeto</th><th class="p-4">Diâmetro Max (m)</th><th class="p-4">Velocidade Rel.</th><th class="p-4">Distância (Terra)</th><th class="p-4 pr-6">Status de Risco</th></tr>
+                            <tr>
+                                <th class="p-4 pl-6">Visual</th>
+                                <th class="p-4">Objeto</th>
+                                <th class="p-4">Diâmetro Max (m)</th>
+                                <th class="p-4">Velocidade Rel.</th>
+                                <th class="p-4">Distância (Terra)</th>
+                                <th class="p-4 pr-6">Status de Risco</th>
+                            </tr>
                         </thead>
                         <tbody class="divide-y divide-white/5 text-[11px]">
                             {% for asteroide in asteroides %}
                             {% set f_idx = (asteroide.id | int) % 10 %}
-                            <tr class="hover:bg-white/[0.02] transition-colors group asteroid-row" data-hazardous="{{ 'true' if asteroide.is_potentially_hazardous_asteroid else 'false' }}">
-                                <td class="p-4 pl-6"><div class="w-10 h-10 rounded-full overflow-hidden border border-white/10 bg-slate-900"><img src="{{ fotos_procedurais[f_idx] }}" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1614728894747-a83421e2b9c9?w=100&h=100&fit=crop';" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all"></div></td>
-                                <td class="p-4"><span class="font-apple font-bold text-white group-hover:text-electric transition-colors uppercase">{{ asteroide.name.replace('(', '').replace(')', '') }}</span><div class="text-[0.6rem] text-slate-500 font-mono">#{{ asteroide.id }}</div></td>
+                            <tr class="hover:bg-white/[0.02] transition-colors group asteroid-row"
+                                data-hazardous="{{ 'true' if asteroide.is_potentially_hazardous_asteroid else 'false' }}">
+                                <td class="p-4 pl-6">
+                                    <div class="w-10 h-10 rounded-full overflow-hidden border border-white/10 bg-slate-900">
+                                        <img src="{{ fotos_procedurais[f_idx] }}"
+                                             onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1614728894747-a83421e2b9c9?w=100&h=100&fit=crop';"
+                                             class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all">
+                                    </div>
+                                </td>
+                                <td class="p-4">
+                                    <span class="font-apple font-bold text-white group-hover:text-electric transition-colors uppercase">
+                                        {{ asteroide.name.replace('(', '').replace(')', '') }}
+                                    </span>
+                                    <div class="text-[0.6rem] text-slate-500 font-mono">#{{ asteroide.id }}</div>
+                                </td>
                                 <td class="p-4 font-mono text-slate-300">{{ asteroide.estimated_diameter.meters.estimated_diameter_max | round(1) }}m</td>
                                 <td class="p-4 font-mono text-slate-300">{{ (asteroide.close_approach_data[0].relative_velocity.kilometers_per_hour | float / 1000) | round(1) }}k km/h</td>
-                                <td class="p-4 font-mono"><div class="text-slate-300">{{ (asteroide.close_approach_data[0].miss_distance.kilometers | float / 1000000) | round(2) }}M km</div><div class="text-[0.6rem] text-slate-500">{{ asteroide.close_approach_data[0].miss_distance.lunar | float | round(1) }} LD</div></td>
-                                <td class="p-4 pr-6">{% if asteroide.is_potentially_hazardous_asteroid %}<span class="text-alert font-bold animate-pulse">!! PERIGO !!</span>{% else %}<span class="text-slate-600 font-mono">SEGURO</span>{% endif %}</td>
+                                <td class="p-4 font-mono">
+                                    <div class="text-slate-300">{{ (asteroide.close_approach_data[0].miss_distance.kilometers | float / 1000000) | round(2) }}M km</div>
+                                    <div class="text-[0.6rem] text-slate-500">{{ asteroide.close_approach_data[0].miss_distance.lunar | float | round(1) }} LD</div>
+                                </td>
+                                <td class="p-4 pr-6">
+                                    {% if asteroide.is_potentially_hazardous_asteroid %}
+                                        <span class="text-alert font-bold animate-pulse">!! PERIGO !!</span>
+                                    {% else %}
+                                        <span class="text-slate-600 font-mono">SEGURO</span>
+                                    {% endif %}
+                                </td>
                             </tr>
                             {% endfor %}
                         </tbody>
                     </table>
                 </div>
             </div>
+
         </div>
     </main>
     {% endif %}
 
-    <script>
-        lucide.createIcons();
-        gsap.registerPlugin(ScrollTrigger);
-
-        // TYPEWRITER
-        const tickerText = "[SYSTEM_OK] SCANNING SECTOR 7G... | DEEP SPACE NETWORK: ONLINE | NEOWISE-2 DETECTED... | WAITING FOR UPLINK...";
-        let charIndex = 0;
-        function typeWriter() {
-            if (charIndex < tickerText.length) {
-                document.getElementById("typewriter-ticker").innerHTML += tickerText.charAt(charIndex);
-                charIndex++; setTimeout(typeWriter, 50);
-            }
-        }
-        typeWriter();
-
-        document.getElementById('data').setAttribute('max', new Date().toISOString().split('T')[0]);
-
-        // FILTRO
-        let isFilterActive = false;
-        function toggleHazardous() {
-            isFilterActive = !isFilterActive;
-            const btn = document.getElementById('filterBtn');
-            btn.innerText = `Filtro de Risco: ${isFilterActive ? 'ON' : 'OFF'}`;
-            document.querySelectorAll('.asteroid-row').forEach(row => {
-                row.classList.toggle('hidden-row', isFilterActive && row.dataset.hazardous === 'false');
-            });
-        }
-
-        // GRÁFICO
-        const labelsData = document.getElementById('data-labels');
-        if (labelsData) {
-            const chartLabels = JSON.parse(labelsData.textContent);
-            const chartSizes = JSON.parse(document.getElementById('data-sizes').textContent);
-            const ctx = document.getElementById('sizeChart').getContext('2d');
-            new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: chartLabels,
-                    datasets: [{ label: 'Diâmetro (m)', data: chartSizes, backgroundColor: 'rgba(56, 189, 248, 0.4)', borderColor: '#38bdf8', borderWidth: 1, borderRadius: 5 }]
-                },
-                options: {
-                    responsive: true, maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#64748b' } },
-                        x: { grid: { display: false }, ticks: { color: '#64748b', font: { size: 9 } } }
-                    }
-                }
-            });
-            setTimeout(() => { document.querySelector('.dashboard-section').scrollIntoView({ behavior: 'smooth' }); }, 500);
-        }
-
-        // ANIMAÇÕES GSAP
-        gsap.from(".hero-content > *", { y: 30, opacity: 0, duration: 1, stagger: 0.2, ease: "power3.out" });
-
-        gsap.utils.toArray('.gs-reveal').forEach(function(elem) {
-            ScrollTrigger.create({
-                trigger: elem,
-                start: "top 85%",
-                once: true,
-                onEnter: function() {
-                    gsap.fromTo(elem, { y: 50, opacity: 0 }, { duration: 0.8, y: 0, opacity: 1, ease: "power3.out", overwrite: "auto" });
-                }
-            });
-        });
-
-        // EFEITO MOUSE NAS GLASS PANELS
-        document.querySelectorAll('.glass-panel').forEach(card => {
-            card.addEventListener('mousemove', e => {
-                const rect = card.getBoundingClientRect();
-                card.style.background = `radial-gradient(circle at ${e.clientX - rect.left}px ${e.clientY - rect.top}px, rgba(56,189,248,0.1) 0%, rgba(15, 23, 42, 0.7) 50%)`;
-            });
-            card.addEventListener('mouseleave', () => { card.style.background = 'rgba(15, 23, 42, 0.7)'; });
-        });
-    </script>
+    <!-- Script principal — carregado no fim do body, depois dos dados JSON inline -->
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </body>
 </html>

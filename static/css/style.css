@@ -1,0 +1,158 @@
+/* ============================================================
+   Projeto M.U.R.I.L.O. — Stylesheet
+   ============================================================ */
+
+/* ── Fundo estrelado ── */
+.stars,
+.twinkling {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    width: 100%; height: 100%;
+    display: block;
+}
+
+.stars {
+    background: #000 url('https://raw.githubusercontent.com/danielstuart14/CSS_Fills/master/star-bg.png') repeat top center;
+    z-index: -2;
+}
+
+.twinkling {
+    background: transparent url('https://raw.githubusercontent.com/danielstuart14/CSS_Fills/master/twinkling.png') repeat top center;
+    z-index: -1;
+    animation: move-twink-back 200s linear infinite;
+}
+
+@keyframes move-twink-back {
+    from { background-position: 0 0; }
+    to   { background-position: -10000px 5000px; }
+}
+
+/* ── Background dinâmico da NASA (background-image vem via style attr no HTML) ── */
+.dynamic-nasa-bg {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: -1;
+    background-size: cover;
+    background-position: center;
+    opacity: 0.3;
+    filter: brightness(0.4);
+}
+
+/* ── Efeito CRT (scanlines) ── */
+.crt::before {
+    content: " ";
+    display: block;
+    position: fixed;
+    top: 0; left: 0; bottom: 0; right: 0;
+    background:
+        linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.15) 50%),
+        linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+    z-index: 100;
+    background-size: 100% 4px, 3px 100%;
+    pointer-events: none;
+}
+
+/* ── Glass panel ── */
+.glass-panel {
+    background: rgba(15, 23, 42, 0.7);
+    backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+}
+
+/* ── Scanline animada ── */
+.scanline {
+    width: 100%;
+    height: 100px;
+    z-index: 50;
+    position: fixed;
+    pointer-events: none;
+    background: linear-gradient(0deg, rgba(0,0,0,0) 0%, rgba(56,189,248,0.05) 50%, rgba(0,0,0,0) 100%);
+    opacity: 0.1;
+    animation: scanline 8s linear infinite;
+}
+
+@keyframes scanline {
+    0%   { top: -100px; }
+    100% { top: 100vh; }
+}
+
+/* ── Destaque azul ── */
+.destaque-azul {
+    color: #38bdf8;
+    font-weight: bold;
+}
+
+/* ── Ticker / news-bar ── */
+.ticker-wrap {
+    width: 100%;
+    overflow: hidden;
+    background-color: rgba(2, 6, 23, 0.9);
+    border-bottom: 1px solid rgba(56, 189, 248, 0.2);
+}
+
+.ticker {
+    display: inline-block;
+    white-space: nowrap;
+    padding-right: 100%;
+}
+
+/* ── Radar ── */
+.radar {
+    position: relative;
+    width: 120px; height: 120px;
+    border-radius: 50%;
+    border: 2px solid rgba(56, 189, 248, 0.5);
+    overflow: hidden;
+    background: black;
+    box-shadow: inset 0 0 20px #001a2c;
+}
+
+.radar::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: conic-gradient(from 0deg, rgba(56,189,248,0.5) 0%, transparent 40%);
+    animation: spin 2s linear infinite;
+}
+
+.radar::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background:
+        radial-gradient(circle, transparent 30%, rgba(56,189,248,0.1) 31%, transparent 32%,
+            transparent 60%, rgba(56,189,248,0.1) 61%, transparent 62%),
+        linear-gradient(to right, rgba(56,189,248,0.1) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(56,189,248,0.1) 1px, transparent 1px);
+    background-size: 100% 100%, 50% 100%, 100% 50%;
+    z-index: 1;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+}
+
+/* ── Cursor piscante ── */
+.cursor {
+    display: inline-block;
+    width: 10px; height: 1em;
+    background: #38bdf8;
+    margin-left: 4px;
+    animation: blink 1s infinite;
+    vertical-align: middle;
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0; }
+}
+
+/* ── Filtro de risco (oculta linhas) ── */
+.hidden-row {
+    display: none !important;
+}
