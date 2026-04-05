@@ -258,11 +258,20 @@ function generateDossier() {
         html += "</ul>";
     }
     content.innerHTML = html;
-
-    setTimeout(() => {
-        alert("RELATÓRIO GERADO NO TERMINAL DO PROJETO. PROTOCOLO DE EXPORTAÇÃO ATIVO.");
-    }, 5000);
 }
+
+function closeDossierAndShowAlert() {
+    document.getElementById('dossier-template').classList.add('hidden');
+    document.getElementById('custom-alert-modal').classList.remove('hidden');
+
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+        }
+    }
+
+    function closeCustomAlert() {
+        document.getElementById('custom-alert-modal').classList.add('hidden');
+    }
 
 document.addEventListener('DOMContentLoaded', () => {
     initOrbitalViewer();

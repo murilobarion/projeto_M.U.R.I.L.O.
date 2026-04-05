@@ -365,7 +365,23 @@
             <p class="mb-4 font-mono-data">DATA: {{ data }} | PROTOCOLO: M.U.R.I.L.O-{{ data.replace('-', '') }}</p>
             <div id="dossier-content" class="space-y-4"></div>
             <div class="mt-10 text-[10px] text-gray-500 italic text-center">Este documento contém dados de telemetria da rede Deep Space. Divulgação não autorizada resultará em sanções intergalácticas.</div>
-            <button onclick="document.getElementById('dossier-template').classList.add('hidden')" class="absolute top-4 left-4 text-xs underline cursor-pointer text-slate-500 hover:text-alert transition-colors">Fechar Janela</button>
+            
+            <button onclick="closeDossierAndShowAlert()" class="absolute top-4 left-4 text-xs underline cursor-pointer text-slate-500 hover:text-alert transition-colors">Fechar Janela</button>
+        </div>
+    </div>
+
+    <div id="custom-alert-modal" class="hidden fixed inset-0 flex items-center justify-center p-6 z-[200] bg-black/80 backdrop-blur-sm transition-opacity">
+        <div class="glass-panel p-8 max-w-sm w-full relative border-t-4 border-alert rounded-2xl shadow-[0_0_40px_rgba(255,0,60,0.2)] text-center">
+            <div class="mx-auto w-12 h-12 mb-4 bg-alert/20 rounded-full flex items-center justify-center border border-alert/50">
+                <i data-lucide="shield-check" class="w-6 h-6 text-alert"></i>
+            </div>
+            <h2 class="text-xl font-display text-white mb-2 tracking-widest uppercase">Protocolo Ativo</h2>
+            <p class="font-mono text-xs text-slate-400 mb-8 leading-relaxed">
+                Relatório gerado no terminal do projeto. Protocolo de exportação finalizado com sucesso.
+            </p>
+            <button onclick="closeCustomAlert()" class="bg-alert/10 hover:bg-alert text-alert hover:text-white border border-alert/30 transition-all duration-300 px-8 py-3 rounded-full font-mono text-xs uppercase tracking-widest w-full">
+                OK. Fechar.
+            </button>
         </div>
     </div>
     {% endif %}
