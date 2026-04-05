@@ -87,7 +87,27 @@ if (quakeSection) {
     gsap.to("#icone-sismico", { scale: 1.15, opacity: 0.7, duration: 0.6, repeat: -1, yoyo: true, ease: "power1.inOut" });
 }
 
-// O MOTOR THREE.JS FUNCIONAL (Versão com OrbitControls e sem os pivôs complexos)
+function createAsteroidLabel(text) {
+    const canvas = document.createElement('canvas');
+    const context = canvas.getContext('2d');
+    canvas.width = 256;
+    canvas.height = 64;
+
+    context.clearRect(0, 0, canvas.width, canvas.height);
+
+    context.font = "Bold 24px 'JetBrains Mono', monospace";
+    context.fillStyle = "#38bdf8"; 
+    context.textAlign = "center";
+    context.fillText(text, 128, 40);
+
+    const texture = new THREE.CanvasTexture(canvas);
+    const spriteMaterial = new THREE.SpriteMaterial({ map: texture, transparent: true });
+    const sprite = new THREE.Sprite(spriteMaterial);
+
+    sprite.scale.set(12, 3, 1); 
+    return sprite;
+}
+
 function initOrbitalViewer() {
     const container = document.getElementById('canvas-container');
     if (!container) return;
@@ -115,8 +135,10 @@ function initOrbitalViewer() {
     controls.enablePan = false;    
     controls.autoRotate = true;    
     controls.autoRotateSpeed = 0.5;
+    controls.minDistance = 10;
+    controls.maxDistance = 250;
 
-    const earthGeometry = new THREE.SphereGeometry(2, 32, 32);
+    const earthGeometry = new THREE.SphereGeometry(8, 32, 32);
     const earthMaterial = new THREE.MeshBasicMaterial({ color: 0x38bdf8, wireframe: true, transparent: true, opacity: 0.4 });
     const earth = new THREE.Mesh(earthGeometry, earthMaterial);
     scene.add(earth);
@@ -131,19 +153,20 @@ function initOrbitalViewer() {
     let mouseX = 0, mouseY = 0;
 
     asteroids3D.forEach((astData, index) => {
-        const radius = astData.radius_km.m_km * 1.2; 
+        const radius = (astData.radius_km.m_km * 3.0) + 12;
 
         const astSystem = new THREE.Group();
         astSystem.rotation.x = Math.random() * Math.PI;
         astSystem.rotation.y = Math.random() * Math.PI;
 
-        const orbitGeom = new THREE.RingGeometry(radius, radius + 0.05, 64);
+        const orbitGeom = new THREE.RingGeometry(radius, radius + 0.04, 128);
         const orbitMat = new THREE.MeshBasicMaterial({ 
-            color: orbitColor, 
+            color: 0xa8b1ff,
             side: THREE.DoubleSide, 
             transparent: true, 
-            opacity: 0.25 
+            opacity: 0.65
         });
+
         const orbitMesh = new THREE.Mesh(orbitGeom, orbitMat);
 
         orbitMesh.rotation.x = Math.PI / 2;
@@ -154,7 +177,7 @@ function initOrbitalViewer() {
         pivot.userData.speed = 0.001 + (Math.random() * 0.002);
         astSystem.add(pivot);
 
-        const scaledRadius = (astData.diameter / 1000.0) * 0.6;
+        const scaledRadius = Math.max((astData.diameter / 1000.0) * 8.0, 0.8);
         const astGeometry = new THREE.SphereGeometry(scaledRadius, 16, 16);
         const astMaterial = new THREE.MeshLambertMaterial({ 
             color: asteroideColor,
@@ -162,6 +185,9 @@ function initOrbitalViewer() {
             emissiveIntensity: 0.2
         });
         const astPoint = new THREE.Mesh(astGeometry, astMaterial);
+        const label = createAsteroidLabel(astData.name);
+        label.position.set(0, scaledRadius + 1.5, 0); 
+        astPoint.add(label);
 
         astPoint.position.set(radius, 0, 0);
         pivot.add(astPoint); 
@@ -174,7 +200,7 @@ function initOrbitalViewer() {
     const ambientLight = new THREE.AmbientLight(0x404040, 3); 
     scene.add(ambientLight);
 
-    camera.position.set(0, 15, 30); 
+    camera.position.set(0, 45, 95);
     camera.lookAt(0, 0, 0);
 
     renderer.domElement.addEventListener('mousedown', () => renderer.domElement.style.cursor = "grabbing");
