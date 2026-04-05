@@ -1,18 +1,7 @@
-/* ============================================================
-   Projeto M.U.R.I.L.O. — Script principal
-   Dependências (carregadas via CDN no HTML antes deste arquivo):
-     - GSAP 3.12.2 + ScrollTrigger
-     - Lucide
-     - Chart.js
-   ============================================================ */
-
-/* ── Inicialização de ícones Lucide ── */
 lucide.createIcons();
 
-/* ── Registro do plugin GSAP ── */
 gsap.registerPlugin(ScrollTrigger);
 
-/* ── Typewriter no ticker ── */
 const tickerText =
     "[SYSTEM_OK] SCANNING SECTOR 7G... | DEEP SPACE NETWORK: ONLINE | NEOWISE-2 DETECTED... | WAITING FOR UPLINK...";
 let charIndex = 0;
@@ -27,13 +16,11 @@ function typeWriter() {
 }
 typeWriter();
 
-/* ── Limita o campo de data ao dia de hoje ── */
 document.getElementById('data').setAttribute(
     'max',
     new Date().toISOString().split('T')[0]
 );
 
-/* ── Filtro de risco (botão Radar) ── */
 let isFilterActive = false;
 
 function toggleHazardous() {
@@ -48,7 +35,6 @@ function toggleHazardous() {
     });
 }
 
-/* ── Gráfico de barras (só renderiza quando há dados) ── */
 const labelsEl = document.getElementById('data-labels');
 if (labelsEl) {
     const chartLabels = JSON.parse(labelsEl.textContent);
@@ -85,14 +71,12 @@ if (labelsEl) {
         }
     });
 
-    /* Rola suavemente para o dashboard após a busca */
     setTimeout(() => {
         document.querySelector('.dashboard-section')
-                .scrollIntoView({ behavior: 'smooth' });
+            .scrollIntoView({ behavior: 'smooth' });
     }, 500);
 }
 
-/* ── Animações GSAP de entrada ── */
 gsap.from(".hero-content > *", {
     y: 30, opacity: 0, duration: 1, stagger: 0.2, ease: "power3.out"
 });
@@ -112,7 +96,6 @@ gsap.utils.toArray('.gs-reveal').forEach(elem => {
     });
 });
 
-/* ── Efeito de luz radial ao passar o mouse nas glass panels ── */
 document.querySelectorAll('.glass-panel').forEach(card => {
     card.addEventListener('mousemove', e => {
         const rect = card.getBoundingClientRect();
@@ -124,3 +107,17 @@ document.querySelectorAll('.glass-panel').forEach(card => {
         card.style.background = 'rgba(15, 23, 42, 0.7)';
     });
 });
+
+const quakeSection = document.querySelector('.quake-section');
+if (quakeSection) {
+    console.log("%c[ASTROQUAKE] Sismógrafos online. Buscando correlações caóticas... ✓", "color: #f97316; font-weight: bold; background: #2a1205; padding: 4px; border-radius: 4px;");
+
+    gsap.to("#icone-sismico", {
+        scale: 1.15,
+        opacity: 0.7,
+        duration: 0.6,
+        repeat: -1,
+        yoyo: true,
+        ease: "power1.inOut"
+    });
+}

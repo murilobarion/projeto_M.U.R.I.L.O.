@@ -8,12 +8,10 @@
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/logo-murilo.png') }}">
     <meta name="description" content="Projeto M.U.R.I.L.O. - Monitoramento Universal de Rochas Interplanetárias">
 
-    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=JetBrains+Mono:wght@400;700&family=Orbitron:wght@500;800&family=VT323&display=swap" rel="stylesheet">
 
-    <!-- Tailwind CSS (CDN) -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -42,36 +40,29 @@
         }
     </script>
 
-    <!-- Bibliotecas de terceiros (CDN) — devem vir ANTES do script.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <!-- CSS do projeto -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body class="bg-space text-slate-400 font-apple overflow-x-hidden antialiased selection:bg-electric selection:text-black crt">
 
-    <!-- Camadas de fundo -->
     <div class="stars"></div>
     <div class="twinkling"></div>
-    <!-- background-image definido inline para que o Jinja2 resolva bg_nasa corretamente -->
     <div class="dynamic-nasa-bg" style="background-image: url('{{ bg_nasa }}');"></div>
     <div class="scanline"></div>
 
-    <!-- Cantos decorativos -->
     <div class="fixed top-4 left-4 w-8 h-8 border-t-2 border-l-2 border-electric opacity-50 z-50 pointer-events-none"></div>
     <div class="fixed top-4 right-4 w-8 h-8 border-t-2 border-r-2 border-electric opacity-50 z-50 pointer-events-none"></div>
     <div class="fixed bottom-4 left-4 w-8 h-8 border-b-2 border-l-2 border-electric opacity-50 z-50 pointer-events-none"></div>
     <div class="fixed bottom-4 right-4 w-8 h-8 border-b-2 border-r-2 border-electric opacity-50 z-50 pointer-events-none"></div>
 
-    <!-- Ticker superior -->
     <div class="fixed top-0 z-40 ticker-wrap py-1 font-mono text-[10px] text-electric/80 uppercase tracking-widest">
         <div class="ticker" id="typewriter-ticker"></div>
     </div>
 
-    <!-- ═══════════════════ HERO ═══════════════════ -->
     <header class="min-h-screen flex flex-col justify-center items-center relative px-4 pt-20 pb-32">
         <div class="text-center z-10 w-full max-w-5xl mx-auto hero-content">
 
@@ -131,7 +122,6 @@
         </div>
     </header>
 
-    <!-- ═══════════════════ DASHBOARD ═══════════════════ -->
     {% if asteroides %}
     {# Dados do gráfico passados via JSON inline para o script.js #}
     <script id="data-labels" type="application/json">{{ chart_labels | safe }}</script>
@@ -155,7 +145,6 @@
 
         <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
 
-            <!-- Card: total de objetos -->
             <div class="glass-panel p-6 rounded-3xl md:col-span-1 flex flex-col justify-between group gs-reveal">
                 <div class="flex items-center gap-3 text-slate-400 mb-4">
                     <i data-lucide="activity" class="w-5 h-5 text-nebula"></i>
@@ -170,7 +159,6 @@
             {% set hazardous = namespace(found=false) %}
             {% for asteroide in asteroides %}{% if asteroide.is_potentially_hazardous_asteroid %}{% set hazardous.found = true %}{% endif %}{% endfor %}
 
-            <!-- Card: análise de risco -->
             <div class="glass-panel p-6 rounded-3xl md:col-span-2 relative overflow-hidden group gs-reveal {% if hazardous.found %}border-alert/50 shadow-[0_0_30px_rgba(255,0,60,0.15)]{% endif %}">
                 <div class="absolute inset-0 bg-cover bg-center opacity-20 mix-blend-screen grayscale group-hover:scale-105 transition-transform duration-1000"
                      style="background-image: url('https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?q=80&w=1000&auto=format&fit=crop');"></div>
@@ -197,7 +185,6 @@
                 </div>
             </div>
 
-            <!-- Card: radar + filtro -->
             <div class="glass-panel p-6 rounded-3xl md:col-span-1 flex flex-col items-center justify-center gs-reveal text-center">
                 <div class="radar mb-4"></div>
                 <button onclick="toggleHazardous()" id="filterBtn"
@@ -206,7 +193,29 @@
                 </button>
             </div>
 
-            <!-- Card: gráfico de magnitude -->
+            {% if terremotos %}
+            <div class="glass-panel p-6 rounded-3xl md:col-span-4 flex flex-col md:flex-row justify-between items-center group gs-reveal border-orange-500/20 shadow-[0_0_20px_rgba(249,115,22,0.05)]">
+                <div class="flex items-center gap-4 mb-4 md:mb-0">
+                    <div class="p-3 bg-orange-500/10 rounded-full border border-orange-500/30">
+                        <i data-lucide="radio" class="w-8 h-8 text-orange-400 group-hover:scale-110 transition-transform" id="icone-sismico"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-mono text-xs uppercase tracking-widest text-slate-400">Atividade Sísmica (Mag > 2.5)</h4>
+                        <span class="text-4xl font-apple font-bold text-white">{{ total_terremotos }}</span>
+                        <span class="text-sm text-slate-500 ml-2">tremores detectados</span>
+                    </div>
+                </div>
+                <div class="text-right flex flex-col items-end">
+                    <p class="font-mono text-[0.6rem] text-slate-500 uppercase mb-1 flex items-center gap-1">
+                        <i data-lucide="microscope" class="w-3 h-3"></i> Índice de Correlação
+                    </p>
+                    <div class="text-orange-400 font-mono text-sm bg-orange-950/40 px-4 py-2 rounded-lg border border-orange-500/20">
+                        {{ correlacao_ironica }}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
             <div class="glass-panel p-6 rounded-3xl md:col-span-4 gs-reveal">
                 <h4 class="font-mono text-[0.7rem] uppercase tracking-widest mb-4 flex items-center gap-2 text-electric">
                     <i data-lucide="bar-chart-3" class="w-4 h-4"></i> Escala de Magnitude (Diâmetro m)
@@ -214,7 +223,6 @@
                 <div style="height: 200px; width: 100%;"><canvas id="sizeChart"></canvas></div>
             </div>
 
-            <!-- Tabela de telemetria detalhada -->
             <div class="glass-panel rounded-3xl md:col-span-4 overflow-hidden gs-reveal border-white/5">
                 <div class="p-6 border-b border-white/5">
                     <h4 class="font-mono text-sm uppercase text-slate-300 flex items-center gap-2">
@@ -271,11 +279,57 @@
                 </div>
             </div>
 
+            {% if terremotos %}
+            <div class="glass-panel rounded-3xl md:col-span-4 overflow-hidden gs-reveal border-orange-500/10 mt-6 quake-section">
+                <div class="p-6 border-b border-orange-500/10 flex items-center justify-between">
+                    <h4 class="font-mono text-sm uppercase text-orange-400 flex items-center gap-2">
+                        <i data-lucide="waves" class="w-4 h-4"></i> Top 5 Tremores do Dia
+                    </h4>
+                    <span class="font-mono text-[0.6rem] px-2 py-1 bg-orange-500/20 text-orange-300 rounded border border-orange-500/30">USGS Data Network</span>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left whitespace-nowrap">
+                        <thead class="bg-white/5 font-mono text-[0.7rem] uppercase text-slate-400 tracking-wider">
+                            <tr>
+                                <th class="p-4 pl-6">Magnitude</th>
+                                <th class="p-4">Localização (Epicentro)</th>
+                                <th class="p-4">Horário (Local)</th>
+                                <th class="p-4 pr-6">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-white/5 text-[11px]">
+                            {% for tremor in terremotos %}
+                            <tr class="hover:bg-orange-500/[0.05] transition-colors">
+                                <td class="p-4 pl-6">
+                                    <span class="font-apple text-lg font-bold {% if tremor.properties.mag >= 5.0 %}text-alert animate-pulse drop-shadow-[0_0_8px_rgba(255,0,60,0.8)]{% else %}text-orange-400{% endif %}">
+                                        {{ tremor.properties.mag | round(1) }}
+                                    </span>
+                                </td>
+                                <td class="p-4 font-mono text-slate-300">
+                                    {{ tremor.properties.place }}
+                                </td>
+                                <td class="p-4 font-mono text-slate-400">
+                                    {{ tremor.data_formatada }}
+                                </td>
+                                <td class="p-4 pr-6">
+                                    {% if tremor.properties.mag >= 5.0 %}
+                                        <span class="text-alert font-bold border border-alert px-2 py-1 rounded text-[0.6rem]">CRÍTICO</span>
+                                    {% else %}
+                                        <span class="text-orange-300/70 font-mono border border-orange-500/30 px-2 py-1 rounded text-[0.6rem]">MODERADO</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% endif %}
+
         </div>
     </main>
     {% endif %}
 
-    <!-- Script principal — carregado no fim do body, depois dos dados JSON inline -->
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </body>
 </html>

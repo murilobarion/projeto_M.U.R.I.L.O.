@@ -4,10 +4,8 @@ import os
 import json
 import pandas as pd
 import io
-from datetime import datetime
+from datetime import datetime, timedelta
 
-# ── Caminhos corretos para a estrutura NASA/ ──────────────────────────────────
-# api/index.py está em NASA/api/, então subimos um nível para NASA/
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
 app = Flask(
@@ -16,7 +14,6 @@ app = Flask(
     static_folder=os.path.join(BASE_DIR, 'static'),
 )
 
-# ─────────────────────────────────────────────────────────────────────────────
 
 def get_nasa_apod():
     api_key = os.environ.get('NASA_API_KEY', "faZ5X3HvBrJ32ynZMH7lp08wBESv3ZOdKmXuf6f3")
@@ -38,6 +35,10 @@ def index():
         get_nasa_apod()
         or 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2072&auto=format&fit=crop'
     )
+
+    terremotos = []
+    total_terremotos = 0
+    correlacao_ironica = ""
 
     lista_fotos = [
         "https://images.unsplash.com/photo-1614728894747-a83421e2b9c9?w=150&h=150&fit=crop",
@@ -77,6 +78,39 @@ def index():
                         chart_data.append(
                             a['estimated_diameter']['meters']['estimated_diameter_max']
                         )
+            
+                    try:
+                        data_obj = datetime.strptime(data_pesquisa, '%Y-%m-%d')
+                        dia_seguinte = (data_obj + timedelta(days=1)).strftime('%Y-%m-%d')
+                        
+                        link_usgs = f"https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&starttime={data_pesquisa}&endtime={dia_seguinte}&minmagnitude=2.5"
+                        res_eq = requests.get(link_usgs, timeout=10)
+                        
+                        if res_eq.status_code == 200:
+                            dados_eq = res_eq.json()
+                            total_terremotos = dados_eq['metadata']['count']
+                            features = dados_eq['features']
+                            
+                            features.sort(key=lambda x: x['properties']['mag'], reverse=True)
+                            terremotos = features[:5] # Pega o Top 5
+                            
+                            # Formata a hora de milissegundos para um horário legível
+                            for t in terremotos:
+                                tempo_ms = t['properties']['time']
+                                t['data_formatada'] = datetime.fromtimestamp(tempo_ms / 1000.0).strftime('%H:%M:%S')
+
+                            if total_terremotos > 0 and len(dados_asteroides) > 0:
+                                # Um cálculo zueiro misturando a qtde de asteroides e terremotos
+                                chance = min(99.9, (len(dados_asteroides) * 0.082) + (total_terremotos * 0.015))
+                                correlacao_ironica = f"{chance:.3f}% de chance da culpa ser do espaço."
+                            elif total_terremotos > 0:
+                                correlacao_ironica = "0% de culpa espacial. Apenas a Terra espreguiçando."
+                            else:
+                                correlacao_ironica = "Nenhum tremor. A Terra está imóvel de medo."
+                    except Exception as e:
+                        print("Erro no AstroQuake:", e)
+                        correlacao_ironica = "Sismógrafos offline no multiverso."
+
                 else:
                     erro = "FALHA NA CONEXÃO COM A REDE DEEP SPACE."
             except Exception:
@@ -91,6 +125,9 @@ def index():
         chart_labels=json.dumps(chart_labels),
         chart_data=json.dumps(chart_data),
         fotos_procedurais=lista_fotos,
+        terremotos=terremotos,
+        total_terremotos=total_terremotos,
+        correlacao_ironica=correlacao_ironica
     )
 
 
