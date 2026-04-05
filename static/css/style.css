@@ -202,3 +202,12 @@ body::after {
     pointer-events: auto;
     opacity: 1;
 }
+
+input[type="date"] {
+    color-scheme: dark; /* Isso avisa o navegador para tentar escurecer o calendário */
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    filter: invert(0.8) sepia(100%) saturate(1000%) hue-rotate(170deg); /* Faz o ícone do calendário ficar azul electric */
+}
