@@ -142,3 +142,63 @@
 .hidden-row {
     display: none !important;
 }
+
+/* NOVO - [UPGRADE VISUAL] */
+
+/* Tipografia de Elite para Dados */
+.font-mono-data {
+    font-family: 'JetBrains Mono', monospace !important;
+    letter-spacing: -0.05em;
+    font-weight: 700;
+}
+
+/* Grid Milimetrado Técnico (Background secundário para profundidade) */
+body::after {
+    content: "";
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background-image: 
+        linear-gradient(rgba(56, 189, 248, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(56, 189, 248, 0.03) 1px, transparent 1px);
+    background-size: 20px 20px;
+    pointer-events: none;
+    z-index: -1;
+}
+
+/* Efeito Hover nos Números do Dashboard */
+.scramble-text {
+    cursor: default;
+    transition: color 0.3s ease;
+}
+
+.scramble-text:hover {
+    color: #38bdf8;
+}
+
+/* Documento de Dossiê Confidencial */
+#dossier-template {
+    background: radial-gradient(circle, rgba(0,0,0,0.9) 0%, #000 100%);
+}
+
+.report-dot-trigger .font-mono-data {
+    font-size: 1.75rem;
+    line-height: 1;
+    color: #ffffff;
+}
+
+#canvas-container canvas {
+    display: block;
+    max-width: 100%;
+    max-height: 100%;
+}
+
+.report-full-btn {
+    pointer-events: none; 
+    opacity: 0;
+}
+
+.report-notification-container:hover .report-full-btn {
+    pointer-events: auto;
+    opacity: 1;
+}

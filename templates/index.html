@@ -44,6 +44,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
@@ -65,22 +69,18 @@
 
     <header class="min-h-screen flex flex-col justify-center items-center relative px-4 pt-20 pb-32">
         <div class="text-center z-10 w-full max-w-5xl mx-auto hero-content">
-
             <div class="flex justify-center mb-6">
                 <div class="p-1 bg-electric/10 rounded-full border border-electric/30 shadow-[0_0_40px_rgba(56,189,248,0.2)]">
                     <img src="{{ url_for('static', filename='img/logo-murilo.png') }}" class="w-24 h-24 md:w-32 md:h-32 rounded-full">
                 </div>
             </div>
-
             <h2 class="text-electric font-mono text-sm tracking-[0.3em] mb-4 uppercase flex items-center justify-center gap-2">
                 <i data-lucide="satellite" class="w-4 h-4"></i> Rede de Telemetria
             </h2>
-
             <h1 class="font-apple text-5xl md:text-7xl font-extrabold text-white mb-6 tracking-tight drop-shadow-2xl italic">
                 Projeto M<span class="destaque-azul">.</span>U<span class="destaque-azul">.</span>R<span class="destaque-azul">.</span>I<span class="destaque-azul">.</span>L<span class="destaque-azul">.</span>O<span class="destaque-azul">.</span><span class="cursor"></span>
             </h1>
-
-            <p class="text-lg md:text-xl text-slate-300 font-apple mb-10 max-w-3xl mx-auto uppercase tracking-widest">
+            <p class="text-lg md:text-xl text-slate-300 font-apple mb-10 max-w-3xl mx-auto uppercase tracking-widest leading-relaxed">
                 <span class="destaque-azul">M</span>onitoramento
                 <span class="destaque-azul">U</span>niversal de
                 <span class="destaque-azul">R</span>ochas
@@ -88,22 +88,19 @@
                 <span class="destaque-azul">L</span>ixo
                 <span class="destaque-azul">O</span>rbital
             </p>
-
             <div class="w-full flex flex-col items-center gap-6">
                 <form method="POST" class="glass-panel p-2 rounded-2xl md:rounded-full flex flex-col md:flex-row items-center gap-2 border-electric/20 w-full md:w-auto">
                     <div class="flex items-center px-6 py-4 md:py-3 border-b md:border-b-0 md:border-r border-white/10 w-full md:w-auto">
                         <i data-lucide="calendar" class="w-5 h-5 text-electric mr-4"></i>
                         <div class="flex flex-col text-left">
                             <span class="text-[10px] font-mono text-slate-500 uppercase tracking-tighter">Data Alvo</span>
-                            <input type="date" id="data" name="data" required
-                                   class="bg-transparent border-none text-white font-mono outline-none focus:ring-0 [&::-webkit-calendar-picker-indicator]:invert">
+                            <input type="date" id="data" name="data" required class="bg-transparent border-none text-white font-mono outline-none focus:ring-0 [&::-webkit-calendar-picker-indicator]:invert">
                         </div>
                     </div>
                     <button type="submit" class="w-full md:w-auto bg-electric hover:bg-white text-black font-bold py-4 px-10 rounded-xl md:rounded-full transition-all duration-300 flex items-center justify-center gap-3 uppercase text-xs tracking-widest shadow-[0_0_20px_rgba(56,189,248,0.3)]">
                         <i data-lucide="crosshair" class="w-4 h-4"></i> Iniciar Varredura
                     </button>
                 </form>
-
                 {% if asteroides %}
                 <form action="/exportar" method="POST" class="gs-reveal">
                     <input type="hidden" name="data_export" value="{{ data }}">
@@ -115,7 +112,6 @@
                 {% endif %}
             </div>
         </div>
-
         <div class="absolute bottom-10 animate-bounce text-slate-500 flex flex-col items-center gap-2 opacity-50">
             <span class="text-[0.6rem] font-mono uppercase tracking-widest">Status Data</span>
             <i data-lucide="chevron-down" class="w-5 h-5"></i>
@@ -123,12 +119,11 @@
     </header>
 
     {% if asteroides %}
-    {# Dados do gráfico passados via JSON inline para o script.js #}
     <script id="data-labels" type="application/json">{{ chart_labels | safe }}</script>
     <script id="data-sizes"  type="application/json">{{ chart_data  | safe }}</script>
+    <script id="data-3d-asteroids" type="application/json">{{ js_3d_asteroids | safe }}</script>
 
     <main class="w-full max-w-7xl mx-auto px-6 pb-24 z-10 relative dashboard-section">
-
         <div class="mb-12 border-b border-white/10 pb-6 flex justify-between items-end">
             <div>
                 <h3 class="font-apple text-3xl text-white uppercase italic">Relatório Tático</h3>
@@ -144,7 +139,6 @@
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-
             <div class="glass-panel p-6 rounded-3xl md:col-span-1 flex flex-col justify-between group gs-reveal">
                 <div class="flex items-center gap-3 text-slate-400 mb-4">
                     <i data-lucide="activity" class="w-5 h-5 text-nebula"></i>
@@ -160,8 +154,7 @@
             {% for asteroide in asteroides %}{% if asteroide.is_potentially_hazardous_asteroid %}{% set hazardous.found = true %}{% endif %}{% endfor %}
 
             <div class="glass-panel p-6 rounded-3xl md:col-span-2 relative overflow-hidden group gs-reveal {% if hazardous.found %}border-alert/50 shadow-[0_0_30px_rgba(255,0,60,0.15)]{% endif %}">
-                <div class="absolute inset-0 bg-cover bg-center opacity-20 mix-blend-screen grayscale group-hover:scale-105 transition-transform duration-1000"
-                     style="background-image: url('https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?q=80&w=1000&auto=format&fit=crop');"></div>
+                <div class="absolute inset-0 bg-cover bg-center opacity-20 mix-blend-screen grayscale group-hover:scale-105 transition-transform duration-1000" style="background-image: url('https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?q=80&w=1000&auto=format&fit=crop');"></div>
                 <div class="relative z-10 h-full flex flex-col justify-between">
                     <div class="flex items-center gap-3 mb-4">
                         <i data-lucide="alert-triangle" class="w-5 h-5 {% if hazardous.found %}text-alert{% else %}text-terminal_green{% endif %}"></i>
@@ -187,10 +180,28 @@
 
             <div class="glass-panel p-6 rounded-3xl md:col-span-1 flex flex-col items-center justify-center gs-reveal text-center">
                 <div class="radar mb-4"></div>
-                <button onclick="toggleHazardous()" id="filterBtn"
-                        class="font-mono text-[0.6rem] border border-electric/30 px-3 py-1 rounded-full text-electric hover:bg-electric hover:text-black transition-all uppercase tracking-tighter">
+                <button onclick="toggleHazardous()" id="filterBtn" class="font-mono text-[0.6rem] border border-electric/30 px-3 py-1 rounded-full text-electric hover:bg-electric hover:text-black transition-all uppercase tracking-tighter">
                     Filtro de Risco: OFF
                 </button>
+            </div>
+
+            <div class="glass-panel p-6 rounded-3xl md:col-span-2 flex flex-col justify-between gs-reveal border-electric/30">
+                <div class="flex items-center gap-3 text-slate-400 mb-2">
+                    <i data-lucide="zap" class="w-5 h-5 text-electric"></i>
+                    <h4 class="font-mono text-[10px] uppercase tracking-widest">Energia de Impacto Total</h4>
+                </div>
+                <div>
+                    <span class="text-4xl font-mono text-white font-bold scramble-text" data-value="{{ total_energy | default('0.000') }}">0.000</span>
+                    <span class="text-[10px] text-electric ml-1">MT</span>
+                </div>
+            </div>
+
+            <div class="glass-panel p-6 rounded-3xl md:col-span-2 flex flex-col justify-between gs-reveal border-yellow-500/20">
+                <div class="flex items-center gap-3 text-slate-400 mb-2">
+                    <i data-lucide="sun" class="w-5 h-5 text-yellow-500"></i>
+                    <h4 class="font-mono text-[10px] uppercase tracking-widest">Clima Espacial (DONKI)</h4>
+                </div>
+                <span class="text-xl font-apple text-white uppercase italic">{{ space_weather | default('Scanning...') }}</span>
             </div>
 
             {% if terremotos %}
@@ -201,7 +212,7 @@
                     </div>
                     <div>
                         <h4 class="font-mono text-xs uppercase tracking-widest text-slate-400">Atividade Sísmica (Mag > 2.5)</h4>
-                        <span class="text-4xl font-apple font-bold text-white">{{ total_terremotos }}</span>
+                        <span class="text-4xl font-apple font-bold text-white counter font-mono-data">{{ total_terremotos }}</span>
                         <span class="text-sm text-slate-500 ml-2">tremores detectados</span>
                     </div>
                 </div>
@@ -230,7 +241,7 @@
                     </h4>
                 </div>
                 <div class="overflow-x-auto">
-                    <table class="w-full text-left whitespace-nowrap">
+                    <table class="w-full text-left whitespace-nowrap table-tactical">
                         <thead class="bg-white/5 font-mono text-[0.7rem] uppercase text-slate-400 tracking-wider">
                             <tr>
                                 <th class="p-4 pl-6">Visual</th>
@@ -244,24 +255,19 @@
                         <tbody class="divide-y divide-white/5 text-[11px]">
                             {% for asteroide in asteroides %}
                             {% set f_idx = (asteroide.id | int) % 10 %}
-                            <tr class="hover:bg-white/[0.02] transition-colors group asteroid-row"
-                                data-hazardous="{{ 'true' if asteroide.is_potentially_hazardous_asteroid else 'false' }}">
+                            <tr class="hover:bg-white/[0.02] transition-colors group asteroid-row" data-hazardous="{{ 'true' if asteroide.is_potentially_hazardous_asteroid else 'false' }}">
                                 <td class="p-4 pl-6">
                                     <div class="w-10 h-10 rounded-full overflow-hidden border border-white/10 bg-slate-900">
-                                        <img src="{{ fotos_procedurais[f_idx] }}"
-                                             onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1614728894747-a83421e2b9c9?w=100&h=100&fit=crop';"
-                                             class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all">
+                                        <img src="{{ fotos_procedurais[f_idx] }}" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1614728894747-a83421e2b9c9?w=100&h=100&fit=crop';" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all">
                                     </div>
                                 </td>
                                 <td class="p-4">
-                                    <span class="font-apple font-bold text-white group-hover:text-electric transition-colors uppercase">
-                                        {{ asteroide.name.replace('(', '').replace(')', '') }}
-                                    </span>
-                                    <div class="text-[0.6rem] text-slate-500 font-mono">#{{ asteroide.id }}</div>
+                                    <span class="font-apple font-bold text-white group-hover:text-electric transition-colors uppercase">{{ asteroide.name.replace('(', '').replace(')', '') }}</span>
+                                    <div class="text-[0.6rem] text-slate-500 font-mono font-mono-data">#{{ asteroide.id }}</div>
                                 </td>
-                                <td class="p-4 font-mono text-slate-300">{{ asteroide.estimated_diameter.meters.estimated_diameter_max | round(1) }}m</td>
-                                <td class="p-4 font-mono text-slate-300">{{ (asteroide.close_approach_data[0].relative_velocity.kilometers_per_hour | float / 1000) | round(1) }}k km/h</td>
-                                <td class="p-4 font-mono">
+                                <td class="p-4 font-mono text-slate-300 font-mono-data">{{ asteroide.estimated_diameter.meters.estimated_diameter_max | round(1) }}m</td>
+                                <td class="p-4 font-mono text-slate-300 font-mono-data">{{ (asteroide.close_approach_data[0].relative_velocity.kilometers_per_hour | float / 1000) | round(1) }}k km/h</td>
+                                <td class="p-4 font-mono font-mono-data">
                                     <div class="text-slate-300">{{ (asteroide.close_approach_data[0].miss_distance.kilometers | float / 1000000) | round(2) }}M km</div>
                                     <div class="text-[0.6rem] text-slate-500">{{ asteroide.close_approach_data[0].miss_distance.lunar | float | round(1) }} LD</div>
                                 </td>
@@ -288,7 +294,7 @@
                     <span class="font-mono text-[0.6rem] px-2 py-1 bg-orange-500/20 text-orange-300 rounded border border-orange-500/30">USGS Data Network</span>
                 </div>
                 <div class="overflow-x-auto">
-                    <table class="w-full text-left whitespace-nowrap">
+                    <table class="w-full text-left whitespace-nowrap table-tactical">
                         <thead class="bg-white/5 font-mono text-[0.7rem] uppercase text-slate-400 tracking-wider">
                             <tr>
                                 <th class="p-4 pl-6">Magnitude</th>
@@ -299,23 +305,19 @@
                         </thead>
                         <tbody class="divide-y divide-white/5 text-[11px]">
                             {% for tremor in terremotos %}
-                            <tr class="hover:bg-orange-500/[0.05] transition-colors">
+                            <tr class="hover:bg-orange-500/[0.05] transition-colors group">
                                 <td class="p-4 pl-6">
-                                    <span class="font-apple text-lg font-bold {% if tremor.properties.mag >= 5.0 %}text-alert animate-pulse drop-shadow-[0_0_8px_rgba(255,0,60,0.8)]{% else %}text-orange-400{% endif %}">
+                                    <span class="font-apple text-lg font-bold font-mono-data {% if tremor.properties.mag >= 5.0 %}text-alert animate-pulse drop-shadow-[0_0_8px_rgba(255,0,60,0.8)]{% else %}text-orange-400{% endif %}">
                                         {{ tremor.properties.mag | round(1) }}
                                     </span>
                                 </td>
-                                <td class="p-4 font-mono text-slate-300">
-                                    {{ tremor.properties.place }}
-                                </td>
-                                <td class="p-4 font-mono text-slate-400">
-                                    {{ tremor.data_formatada }}
-                                </td>
+                                <td class="p-4 font-mono text-slate-300">{{ tremor.properties.place }}</td>
+                                <td class="p-4 font-mono text-slate-400 font-mono-data">{{ tremor.data_formatada }}</td>
                                 <td class="p-4 pr-6">
                                     {% if tremor.properties.mag >= 5.0 %}
                                         <span class="text-alert font-bold border border-alert px-2 py-1 rounded text-[0.6rem]">CRÍTICO</span>
                                     {% else %}
-                                        <span class="text-orange-300/70 font-mono border border-orange-500/30 px-2 py-1 rounded text-[0.6rem]">MODERADO</span>
+                                        <span class="text-orange-300/70 font-mono border border-orange-500/30 px-2 py-1 rounded text-[0.6rem] group-hover:text-black transition-colors">MODERADO</span>
                                     {% endif %}
                                 </td>
                             </tr>
@@ -328,6 +330,44 @@
 
         </div>
     </main>
+
+    <section id="project-ephemeris" class="w-full max-w-7xl mx-auto px-6 mb-12 gs-reveal">
+        <div class="glass-panel rounded-3xl overflow-hidden relative border-white/5 shadow-[0_0_60px_rgba(56,189,248,0.1)]">
+            <div class="absolute top-6 left-6 z-10 pointer-events-none">
+                <h4 class="font-display text-electric text-lg italic tracking-widest">PROJECT EPHEMERIS</h4>
+                <p class="font-mono text-[10px] text-slate-500 uppercase">Simulação de Proximidade Orbital (Three.js)</p>
+            </div>
+            <div id="canvas-container" class="w-full h-[600px] bg-black/50 cursor-move relative flex items-center justify-center">
+                </div>
+            <div class="absolute bottom-6 left-6 glass-panel p-4 rounded-xl text-[10px] font-mono text-electric pointer-events-none">
+                [SYS_MODE]: REAL-TIME_ORBIT_SIMULATION<br>
+                [TARGET]: EARTH_CENTERED_INERTIAL
+            </div>
+        </div>
+    </section>
+
+    <div class="fixed bottom-10 right-10 z-50">
+        <button onclick="generateDossier()" class="group flex items-center bg-alert text-white h-12 w-12 hover:w-[360px] rounded-full font-display text-[10px] tracking-[0.2em] uppercase shadow-[0_0_30px_rgba(255,0,60,0.6)] transition-all duration-500 overflow-hidden cursor-pointer">
+            <div class="w-12 h-12 flex-shrink-0 flex items-center justify-center animate-pulse group-hover:animate-none">
+                <span class="font-mono text-2xl font-bold font-mono-data mt-1">!</span>
+            </div>
+            <span class="opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100 whitespace-nowrap pr-6">
+                Gerar Relatório de Anomalia
+            </span>
+        </button>
+    </div>
+
+    <div id="dossier-template" class="hidden fixed inset-0 flex items-center justify-center p-10 z-[100] font-mono border-8 border-alert/20">
+        <div class="bg-white text-black p-12 max-w-4xl w-full relative border-double border-4 border-black shadow-2xl">
+            <div class="absolute top-4 right-4 border-2 border-alert text-alert px-4 py-1 font-bold transform rotate-12">CONFIDENCIAL</div>
+            <h1 class="text-4xl font-bold mb-4">RELATÓRIO DE ANOMALIA ESPACIAL</h1>
+            <hr class="border-black mb-6">
+            <p class="mb-4 font-mono-data">DATA: {{ data }} | PROTOCOLO: M.U.R.I.L.O-{{ data.replace('-', '') }}</p>
+            <div id="dossier-content" class="space-y-4"></div>
+            <div class="mt-10 text-[10px] text-gray-500 italic text-center">Este documento contém dados de telemetria da rede Deep Space. Divulgação não autorizada resultará em sanções intergalácticas.</div>
+            <button onclick="document.getElementById('dossier-template').classList.add('hidden')" class="absolute top-4 left-4 text-xs underline cursor-pointer text-slate-500 hover:text-alert transition-colors">Fechar Janela</button>
+        </div>
+    </div>
     {% endif %}
 
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>

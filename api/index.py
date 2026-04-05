@@ -4,8 +4,10 @@ import os
 import json
 import pandas as pd
 import io
+import math
 from datetime import datetime, timedelta
 
+# ── Caminhos para a estrutura NASA/ ──────────────────────────────────
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
 app = Flask(
@@ -13,7 +15,6 @@ app = Flask(
     template_folder=os.path.join(BASE_DIR, 'templates'),
     static_folder=os.path.join(BASE_DIR, 'static'),
 )
-
 
 def get_nasa_apod():
     api_key = os.environ.get('NASA_API_KEY', "faZ5X3HvBrJ32ynZMH7lp08wBESv3ZOdKmXuf6f3")
@@ -24,21 +25,55 @@ def get_nasa_apod():
     except Exception:
         return None
 
+def calculate_kinetic_energy(diameter_m, velocity_km_h):
+    """ Calcula a energia cinética aproximada em Megatons de TNT. """
+    radius = diameter_m / 2
+    volume = (4/3) * math.pi * (radius**3)
+    mass = volume * 3000  # Massa em kg (densidade rocha)
+    velocity_m_s = velocity_km_h / 3.6
+    energy_joules = 0.5 * mass * (velocity_m_s**2)
+    megatons = energy_joules / 4.184e15
+    return round(megatons, 4)
+
+def get_space_weather(data_pesquisa):
+    """Busca eventos de clima espacial (CME) na NASA DONKI."""
+    api_key = os.environ.get('NASA_API_KEY', "faZ5X3HvBrJ32ynZMH7lp08wBESv3ZOdKmXuf6f3")
+    url = f"https://api.nasa.gov/DONKI/CME?startDate={data_pesquisa}&endDate={data_pesquisa}&api_key={api_key}"
+    try:
+        res = requests.get(url, timeout=5)
+        if res.status_code == 200:
+            dados = res.json()
+            return f"{len(dados)} CMEs detectadas" if dados else "Vento Solar Calmo"
+        return "Dados Indisponíveis"
+    except:
+        return "Erro na Telemetria Solar"
+
+def convert_distance_ld(kilometers):
+    """Converte quilômetros para Lunar Distances (LD) e Milhões de km (M km)."""
+    ld = float(kilometers) / 384400 
+    m_km = float(kilometers) / 1000000 
+    return {
+        'kilometers': round(float(kilometers), 1),
+        'ld': round(ld, 1),
+        'm_km': round(m_km, 2)
+    }
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
     dados_asteroides = []
     chart_labels, chart_data = [], []
+    js_3d_asteroids = []
+    
     data_pesquisa = ""
     erro = None
-    bg_nasa = (
-        get_nasa_apod()
-        or 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2072&auto=format&fit=crop'
-    )
+    bg_nasa = get_nasa_apod() or 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2072&auto=format&fit=crop'
 
     terremotos = []
     total_terremotos = 0
     correlacao_ironica = ""
+    
+    total_energy = 0
+    space_weather = "Aguardando Varredura..."
 
     lista_fotos = [
         "https://images.unsplash.com/photo-1614728894747-a83421e2b9c9?w=150&h=150&fit=crop",
@@ -71,13 +106,23 @@ def index():
                 if resposta.status_code == 200:
                     dados = resposta.json()['near_earth_objects'].get(data_pesquisa, [])
                     dados_asteroides = dados
+                    
+                    space_weather = get_space_weather(data_pesquisa)
+
                     for a in dados:
-                        chart_labels.append(
-                            a['name'].split(' ')[-1].replace('(', '').replace(')', '')
-                        )
-                        chart_data.append(
-                            a['estimated_diameter']['meters']['estimated_diameter_max']
-                        )
+                        chart_labels.append(a['name'].split(' ')[-1].replace('(', '').replace(')', ''))
+                        diametro_max = a['estimated_diameter']['meters']['estimated_diameter_max']
+                        chart_data.append(diametro_max)
+                        
+                        js_3d_asteroids.append({
+                            'id': a['id'],
+                            'name': a['name'].replace('(', '').replace(')', ''),
+                            'diameter': diametro_max,
+                            'radius_km': convert_distance_ld(a['close_approach_data'][0]['miss_distance']['kilometers'])
+                        })
+                        
+                        velocidade = float(a['close_approach_data'][0]['relative_velocity']['kilometers_per_hour'])
+                        total_energy += calculate_kinetic_energy(diametro_max, velocidade)
             
                     try:
                         data_obj = datetime.strptime(data_pesquisa, '%Y-%m-%d')
@@ -92,15 +137,13 @@ def index():
                             features = dados_eq['features']
                             
                             features.sort(key=lambda x: x['properties']['mag'], reverse=True)
-                            terremotos = features[:5] # Pega o Top 5
+                            terremotos = features[:5]
                             
-                            # Formata a hora de milissegundos para um horário legível
                             for t in terremotos:
                                 tempo_ms = t['properties']['time']
                                 t['data_formatada'] = datetime.fromtimestamp(tempo_ms / 1000.0).strftime('%H:%M:%S')
 
                             if total_terremotos > 0 and len(dados_asteroides) > 0:
-                                # Um cálculo zueiro misturando a qtde de asteroides e terremotos
                                 chance = min(99.9, (len(dados_asteroides) * 0.082) + (total_terremotos * 0.015))
                                 correlacao_ironica = f"{chance:.3f}% de chance da culpa ser do espaço."
                             elif total_terremotos > 0:
@@ -124,12 +167,14 @@ def index():
         bg_nasa=bg_nasa,
         chart_labels=json.dumps(chart_labels),
         chart_data=json.dumps(chart_data),
+        js_3d_asteroids=json.dumps(js_3d_asteroids),
         fotos_procedurais=lista_fotos,
         terremotos=terremotos,
         total_terremotos=total_terremotos,
-        correlacao_ironica=correlacao_ironica
+        correlacao_ironica=correlacao_ironica,
+        total_energy=round(total_energy, 2),
+        space_weather=space_weather
     )
-
 
 @app.route('/exportar', methods=['POST'])
 def exportar():
@@ -174,3 +219,4 @@ def exportar():
 
 if __name__ == '__main__':
     app.run(debug=True)
+    

@@ -1,37 +1,27 @@
 lucide.createIcons();
-
 gsap.registerPlugin(ScrollTrigger);
 
-const tickerText =
-    "[SYSTEM_OK] SCANNING SECTOR 7G... | DEEP SPACE NETWORK: ONLINE | NEOWISE-2 DETECTED... | WAITING FOR UPLINK...";
+const tickerText = "[SYSTEM_OK] SCANNING SECTOR 7G... | DEEP SPACE NETWORK: ONLINE | NEOWISE-2 DETECTED... | WAITING FOR UPLINK...";
 let charIndex = 0;
 
 function typeWriter() {
     if (charIndex < tickerText.length) {
-        document.getElementById("typewriter-ticker").innerHTML +=
-            tickerText.charAt(charIndex);
+        document.getElementById("typewriter-ticker").innerHTML += tickerText.charAt(charIndex);
         charIndex++;
         setTimeout(typeWriter, 50);
     }
 }
 typeWriter();
 
-document.getElementById('data').setAttribute(
-    'max',
-    new Date().toISOString().split('T')[0]
-);
+document.getElementById('data').setAttribute('max', new Date().toISOString().split('T')[0]);
 
 let isFilterActive = false;
-
 function toggleHazardous() {
     isFilterActive = !isFilterActive;
     const btn = document.getElementById('filterBtn');
     btn.innerText = `Filtro de Risco: ${isFilterActive ? 'ON' : 'OFF'}`;
     document.querySelectorAll('.asteroid-row').forEach(row => {
-        row.classList.toggle(
-            'hidden-row',
-            isFilterActive && row.dataset.hazardous === 'false'
-        );
+        row.classList.toggle('hidden-row', isFilterActive && row.dataset.hazardous === 'false');
     });
 }
 
@@ -59,27 +49,18 @@ if (labelsEl) {
             maintainAspectRatio: false,
             plugins: { legend: { display: false } },
             scales: {
-                y: {
-                    grid:  { color: 'rgba(255,255,255,0.05)' },
-                    ticks: { color: '#64748b' }
-                },
-                x: {
-                    grid:  { display: false },
-                    ticks: { color: '#64748b', font: { size: 9 } }
-                }
+                y: { grid:  { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#64748b' } },
+                x: { grid:  { display: false }, ticks: { color: '#64748b', font: { size: 9 } } }
             }
         }
     });
 
     setTimeout(() => {
-        document.querySelector('.dashboard-section')
-            .scrollIntoView({ behavior: 'smooth' });
+        document.querySelector('.dashboard-section').scrollIntoView({ behavior: 'smooth' });
     }, 500);
 }
 
-gsap.from(".hero-content > *", {
-    y: 30, opacity: 0, duration: 1, stagger: 0.2, ease: "power3.out"
-});
+gsap.from(".hero-content > *", { y: 30, opacity: 0, duration: 1, stagger: 0.2, ease: "power3.out" });
 
 gsap.utils.toArray('.gs-reveal').forEach(elem => {
     ScrollTrigger.create({
@@ -87,11 +68,7 @@ gsap.utils.toArray('.gs-reveal').forEach(elem => {
         start: "top 85%",
         once: true,
         onEnter() {
-            gsap.fromTo(
-                elem,
-                { y: 50, opacity: 0 },
-                { duration: 0.8, y: 0, opacity: 1, ease: "power3.out", overwrite: "auto" }
-            );
+            gsap.fromTo(elem, { y: 50, opacity: 0 }, { duration: 0.8, y: 0, opacity: 1, ease: "power3.out", overwrite: "auto" });
         }
     });
 });
@@ -99,25 +76,169 @@ gsap.utils.toArray('.gs-reveal').forEach(elem => {
 document.querySelectorAll('.glass-panel').forEach(card => {
     card.addEventListener('mousemove', e => {
         const rect = card.getBoundingClientRect();
-        card.style.background =
-            `radial-gradient(circle at ${e.clientX - rect.left}px ${e.clientY - rect.top}px,
-             rgba(56,189,248,0.1) 0%, rgba(15, 23, 42, 0.7) 50%)`;
+        card.style.background = `radial-gradient(circle at ${e.clientX - rect.left}px ${e.clientY - rect.top}px, rgba(56,189,248,0.1) 0%, rgba(15, 23, 42, 0.7) 50%)`;
     });
-    card.addEventListener('mouseleave', () => {
-        card.style.background = 'rgba(15, 23, 42, 0.7)';
-    });
+    card.addEventListener('mouseleave', () => { card.style.background = 'rgba(15, 23, 42, 0.7)'; });
 });
 
 const quakeSection = document.querySelector('.quake-section');
 if (quakeSection) {
     console.log("%c[ASTROQUAKE] Sismógrafos online. Buscando correlações caóticas... ✓", "color: #f97316; font-weight: bold; background: #2a1205; padding: 4px; border-radius: 4px;");
-
-    gsap.to("#icone-sismico", {
-        scale: 1.15,
-        opacity: 0.7,
-        duration: 0.6,
-        repeat: -1,
-        yoyo: true,
-        ease: "power1.inOut"
-    });
+    gsap.to("#icone-sismico", { scale: 1.15, opacity: 0.7, duration: 0.6, repeat: -1, yoyo: true, ease: "power1.inOut" });
 }
+
+// O MOTOR THREE.JS FUNCIONAL (Versão com OrbitControls e sem os pivôs complexos)
+function initOrbitalViewer() {
+    const container = document.getElementById('canvas-container');
+    if (!container) return;
+
+    const asteroidsDataEl = document.getElementById('data-3d-asteroids');
+    let asteroids3D = [];
+    if (asteroidsDataEl) {
+        try { asteroids3D = JSON.parse(asteroidsDataEl.textContent); } 
+        catch (e) { console.error("Erro ao ler dados 3D:", e); }
+    }
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    
+    renderer.setSize(container.clientWidth, container.clientHeight);
+    renderer.domElement.style.margin = "0 auto";
+    renderer.domElement.style.cursor = "grab";
+    container.appendChild(renderer.domElement);
+
+    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true; 
+    controls.dampingFactor = 0.05;
+    controls.enableZoom = true;    
+    controls.enablePan = false;    
+    controls.autoRotate = true;    
+    controls.autoRotateSpeed = 0.5;
+
+    const earthGeometry = new THREE.SphereGeometry(2, 32, 32);
+    const earthMaterial = new THREE.MeshBasicMaterial({ color: 0x38bdf8, wireframe: true, transparent: true, opacity: 0.4 });
+    const earth = new THREE.Mesh(earthGeometry, earthMaterial);
+    scene.add(earth);
+
+    const orbitalGroup = new THREE.Group();
+    scene.add(orbitalGroup);
+
+    const orbitColor = 0x818cf8; 
+    const asteroideColor = 0xc084fc; 
+    const pivots = [];
+
+    let mouseX = 0, mouseY = 0;
+
+    asteroids3D.forEach((astData, index) => {
+        const radius = astData.radius_km.m_km * 1.2; 
+
+        const astSystem = new THREE.Group();
+        astSystem.rotation.x = Math.random() * Math.PI;
+        astSystem.rotation.y = Math.random() * Math.PI;
+
+        const orbitGeom = new THREE.RingGeometry(radius, radius + 0.05, 64);
+        const orbitMat = new THREE.MeshBasicMaterial({ 
+            color: orbitColor, 
+            side: THREE.DoubleSide, 
+            transparent: true, 
+            opacity: 0.25 
+        });
+        const orbitMesh = new THREE.Mesh(orbitGeom, orbitMat);
+
+        orbitMesh.rotation.x = Math.PI / 2;
+        astSystem.add(orbitMesh);
+
+        const pivot = new THREE.Group();
+        pivot.rotation.y = Math.random() * Math.PI * 2;
+        pivot.userData.speed = 0.001 + (Math.random() * 0.002);
+        astSystem.add(pivot);
+
+        const scaledRadius = (astData.diameter / 1000.0) * 0.6;
+        const astGeometry = new THREE.SphereGeometry(scaledRadius, 16, 16);
+        const astMaterial = new THREE.MeshLambertMaterial({ 
+            color: asteroideColor,
+            emissive: asteroideColor,
+            emissiveIntensity: 0.2
+        });
+        const astPoint = new THREE.Mesh(astGeometry, astMaterial);
+
+        astPoint.position.set(radius, 0, 0);
+        pivot.add(astPoint); 
+
+        pivots.push(pivot); 
+        orbitalGroup.add(astSystem);
+    });
+
+
+    const ambientLight = new THREE.AmbientLight(0x404040, 3); 
+    scene.add(ambientLight);
+
+    camera.position.set(0, 15, 30); 
+    camera.lookAt(0, 0, 0);
+
+    renderer.domElement.addEventListener('mousedown', () => renderer.domElement.style.cursor = "grabbing");
+    renderer.domElement.addEventListener('mouseup', () => renderer.domElement.style.cursor = "grab");
+
+    window.addEventListener('resize', () => {
+        camera.aspect = container.clientWidth / container.clientHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(container.clientWidth, container.clientHeight);
+    });
+
+    function animate() {
+        requestAnimationFrame(animate);
+        earth.rotation.y += 0.003;
+        
+        pivots.forEach(pivot => {
+            pivot.rotation.y += pivot.userData.speed; 
+        });
+
+        controls.update();
+        renderer.render(scene, camera);
+    }
+    animate();
+}
+
+function scrambleEffect(element) {
+    const originalValue = element.dataset.value;
+    const chars = "!<>-_\\/[]{}—=+*^?#________";
+    let iteration = 0;
+    const interval = setInterval(() => {
+        element.innerText = originalValue.split("").map((char, index) => {
+            if(index < iteration) return originalValue[index];
+            return chars[Math.floor(Math.random() * chars.length)];
+        }).join("");
+        if(iteration >= originalValue.length) clearInterval(interval);
+        iteration += 1 / 3;
+    }, 30);
+}
+
+function generateDossier() {
+    const modal = document.getElementById('dossier-template');
+    const content = document.getElementById('dossier-content');
+    modal.classList.remove('hidden');
+    
+    const dangerousRows = document.querySelectorAll('.asteroid-row[data-hazardous="true"]');
+    let html = "<p>NENHUMA AMEAÇA IMINENTE DETECTADA NESTA DATA.</p>";
+    
+    if(dangerousRows.length > 0) {
+        html = `<p class='text-red-600 font-bold font-terminal'>AVISO: ${dangerousRows.length} OBJETOS DE ALTO RISCO IDENTIFICADOS.</p><ul class='list-disc pl-5 font-tactical'>`;
+        dangerousRows.forEach(row => {
+            const name = row.querySelector('.font-apple').innerText;
+            const size = row.querySelectorAll('.font-mono-data')[1].innerText;
+            html += `<li class='mb-2'>OBJETO: ${name} | DIÂMETRO EST.: ${size} - Escala de Impacto Crítica.</li>`;
+        });
+        html += "</ul>";
+    }
+    content.innerHTML = html;
+
+    setTimeout(() => {
+        alert("RELATÓRIO GERADO NO TERMINAL DO PROJETO. PROTOCOLO DE EXPORTAÇÃO ATIVO.");
+    }, 5000);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    initOrbitalViewer();
+    document.querySelectorAll('.scramble-text').forEach(scrambleEffect);
+});
