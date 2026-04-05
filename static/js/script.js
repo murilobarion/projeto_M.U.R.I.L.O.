@@ -135,10 +135,10 @@ function initOrbitalViewer() {
     controls.enablePan = false;    
     controls.autoRotate = true;    
     controls.autoRotateSpeed = 0.5;
-    controls.minDistance = 10;
-    controls.maxDistance = 250;
+    controls.minDistance = 40;
+    controls.maxDistance = 570;
 
-    const earthGeometry = new THREE.SphereGeometry(8, 32, 32);
+    const earthGeometry = new THREE.SphereGeometry(30, 32, 32);
     const earthMaterial = new THREE.MeshBasicMaterial({ color: 0x38bdf8, wireframe: true, transparent: true, opacity: 0.4 });
     const earth = new THREE.Mesh(earthGeometry, earthMaterial);
     scene.add(earth);
@@ -153,7 +153,7 @@ function initOrbitalViewer() {
     let mouseX = 0, mouseY = 0;
 
     asteroids3D.forEach((astData, index) => {
-        const radius = (astData.radius_km.m_km * 3.0) + 12;
+        const radius = (astData.radius_km.m_km * 3.0) + 45;
 
         const astSystem = new THREE.Group();
         astSystem.rotation.x = Math.random() * Math.PI;
@@ -177,7 +177,9 @@ function initOrbitalViewer() {
         pivot.userData.speed = 0.001 + (Math.random() * 0.002);
         astSystem.add(pivot);
 
-        const scaledRadius = Math.max((astData.diameter / 1000.0) * 8.0, 0.8);
+        let rawScale = (astData.diameter / 1000.0) * 1.5; 
+        let minChecked = Math.max(rawScale, 0.4);
+        const scaledRadius = Math.min(minChecked, 3.0);
         const astGeometry = new THREE.SphereGeometry(scaledRadius, 16, 16);
         const astMaterial = new THREE.MeshLambertMaterial({ 
             color: asteroideColor,
@@ -200,8 +202,7 @@ function initOrbitalViewer() {
     const ambientLight = new THREE.AmbientLight(0x404040, 3); 
     scene.add(ambientLight);
 
-    camera.position.set(0, 45, 95);
-    camera.lookAt(0, 0, 0);
+    camera.position.set(0, 120, 250);
 
     renderer.domElement.addEventListener('mousedown', () => renderer.domElement.style.cursor = "grabbing");
     renderer.domElement.addEventListener('mouseup', () => renderer.domElement.style.cursor = "grab");

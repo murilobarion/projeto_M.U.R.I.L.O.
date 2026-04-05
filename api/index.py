@@ -145,7 +145,10 @@ def index():
 
                             if total_terremotos > 0 and len(dados_asteroides) > 0:
                                 chance = min(99.9, (len(dados_asteroides) * 0.082) + (total_terremotos * 0.015))
-                                correlacao_ironica = f"{chance:.3f}% de chance da culpa ser do espaço."
+                                if total_energy > 1000000:
+                                    correlacao_ironica = "99.9% de chance! ANOMALIA DE ENERGIA GRAVITACIONAL MASSIVA DETECTADA!"
+                                else:
+                                    correlacao_ironica = f"{chance:.3f}% de chance da culpa ser do espaço."
                             elif total_terremotos > 0:
                                 correlacao_ironica = "0% de culpa espacial. Apenas a Terra espreguiçando."
                             else:
